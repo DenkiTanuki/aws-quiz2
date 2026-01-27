@@ -552,7 +552,7 @@ function render() {
     el("qTitle").textContent = "表示対象なし";
     el("qType").textContent = "-";
     el("qState").textContent = "-";
-    const qt = el("qThought"); qt.textContent = ""; qt.style.display = "none";
+    const qt = el("qThought"); if(qt){ qt.textContent = ""; qt.style.display = "none"; }
     el("qStem").textContent = "表示対象の問題がありません。フィルタを解除するかモードを変更してください。";
     el("choices").innerHTML = "";
     setPanelsHidden();
@@ -585,8 +585,10 @@ function render() {
   }
 
   const qt = el("qThought");
-  if (thought) { qt.textContent = `思想：${thought}`; qt.style.display = ""; }
-  else { qt.textContent = ""; qt.style.display = "none"; }
+  if (qt){
+    if (thought) { qt.textContent = `思想：${thought}`; qt.style.display = ""; }
+    else { qt.textContent = ""; qt.style.display = "none"; }
+  }
 
 
   el("qStem").textContent = stripLeak(q.stem);
