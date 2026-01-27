@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#070a0f"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="AWS問題集"/>
-<title>AWS 問題集 v1.0.3</title>
+<meta name="apple-mobile-web-app-title" content="AWS問題集2"/>
+<title>AWS 問題集2 v1.0.0</title>
 <style>
 :root {
   /* Theme variables (default: dark) */
@@ -53,6 +53,14 @@ select,button,input{font:inherit}
 .btn{ white-space:nowrap; }
 .btn:disabled{opacity:.45;cursor:not-allowed;border-color:rgba(255,255,255,.08)}
 .btn.primary{background:linear-gradient(180deg,#2f80ff,#1c63d8);border-color:rgba(78,161,255,.35)}
+
+/* Thought badges (思想フィルタ) */
+.thoughtbar{max-width:1200px;margin:0 auto;padding:0 12px 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.thoughtBtn{padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--text);cursor:pointer;font-size:12px;}
+.thoughtBtn:hover{border-color:rgba(255,255,255,.22)}
+.thoughtBtn.active{background:rgba(78,161,255,.18);border-color:rgba(78,161,255,.35)}
+.thoughtBtn.all{color:var(--muted)}
+.thoughtHint{font-size:12px;color:var(--muted);margin-left:2px}
 
 /* Light/Beige themes: make key navigation buttons slightly darker for readability */
 body[data-theme="light"] #toggleExplainBtn,
@@ -225,6 +233,7 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
     <button id="histBtn" class="btn">履歴</button>
     <span id="statusBadge" class="badge">正解 0（回答済 0） / 0問</span>
   </div>
+  <div id="thoughtBar" class="thoughtbar"></div>
 </header>
 
 <main>
@@ -401,6 +410,10 @@ let activeList = [];
 let wrongOnly = false;
 let unansweredOnly = false;
 
+// 思想フィルタ（バッジUI）
+let activeThoughts = new Set(); // Set of normalized thoughtTitle
+let thoughtFilterMode = "any"; // "any"(OR) / "all"(AND)  ※現状はanyを使用
+
 let showExplain = false;
 
 function el(id){ return document.getElementById(id); }
@@ -458,6 +471,73 @@ function exportUserGlossaryJson(){
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
 }
 
+
+function normThoughtTitle(s){
+  return (s||"").trim();
+}
+
+function getUniqueThoughtTitles(){
+  const seen = new Set();
+  const out = [];
+  for (const q of QUESTIONS){
+    const t = normThoughtTitle(q.thoughtTitle || q.thought || "");
+    if (!t) continue;
+    if (seen.has(t)) continue;
+    seen.add(t);
+    out.push(t);
+  }
+  return out;
+}
+
+function buildThoughtBar(){
+  const bar = document.getElementById("thoughtBar");
+  if (!bar) return;
+  bar.innerHTML = "";
+  const titles = getUniqueThoughtTitles();
+
+  // [ALL] ボタン
+  const allBtn = document.createElement("button");
+  allBtn.type = "button";
+  allBtn.className = "thoughtBtn all" + (activeThoughts.size===0 ? " active" : "");
+  allBtn.textContent = "ALL（思想）";
+  allBtn.title = "思想フィルタ解除";
+  allBtn.addEventListener("click", ()=>{
+    activeThoughts = new Set();
+    buildThoughtBar();
+    qIndex = 0;
+    applyMode();
+  });
+  bar.appendChild(allBtn);
+
+  // 思想ごとのバッジ
+  for (const t of titles){
+    const b = document.createElement("button");
+    b.type = "button";
+    const active = activeThoughts.has(t);
+    b.className = "thoughtBtn" + (active ? " active" : "");
+    // 表示は短く（長い思想タイトルでもUIが崩れにくい）
+    b.textContent = t.length > 28 ? (t.slice(0,28) + "…") : t;
+    b.title = t;
+    b.addEventListener("click", ()=>{
+      const key = normThoughtTitle(t);
+      if (activeThoughts.has(key)) activeThoughts.delete(key);
+      else {
+        // OR運用：複数ONを許可（必要ならここで1つだけにする）
+        activeThoughts.add(key);
+      }
+      buildThoughtBar();
+      qIndex = 0;
+      applyMode();
+    });
+    bar.appendChild(b);
+  }
+
+  // ヒント（小さく）
+  const hint = document.createElement("span");
+  hint.className = "thoughtHint";
+  hint.textContent = "※思想バッジで横断フィルタ";
+  bar.appendChild(hint);
+}
 function buildChapterOptions() {
   const chs = Array.from(new Set(QUESTIONS.map(q=>q.chapter))).sort((a,b)=>a-b);
   chapterSel.innerHTML = "";
@@ -493,6 +573,17 @@ function applyMode() {
   const mode = modeSel.value;
   // 基本リスト（左プルダウン：全章 or 章指定）を取得
   let list = getBaseList();
+
+  // 思想フィルタ（バッジ）
+  if (activeThoughts && activeThoughts.size > 0) {
+    if (thoughtFilterMode === "all") {
+      // 1問に複数思想を持たせる設計になった場合に備えたAND（現状thoughtTitleは1つ想定）
+      list = list.filter(q => activeThoughts.has(normThoughtTitle(q.thoughtTitle || q.thought || "")));
+    } else {
+      // OR（いずれかの思想に一致）
+      list = list.filter(q => activeThoughts.has(normThoughtTitle(q.thoughtTitle || q.thought || "")));
+    }
+  }
 
   // 並び順（通常 / ランダム）
   if (mode === "random") {
@@ -1046,6 +1137,7 @@ async function init() {
   inferMissingAnswers();
 
   buildChapterOptions();
+  buildThoughtBar();
   chapterSel.value = lsGet("aws_quiz_chapter_sel") || "0";
   modeSel.value = lsGet("aws_quiz_mode_sel") || "normal";
   const savedTheme = lsGet(LS_THEME) || "dark";
