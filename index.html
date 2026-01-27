@@ -1,100 +1,1041 @@
-<div class="box">
-  <h2 style="margin-top:0;">③ 障害は起きる前提で設計せよ</h2>
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#070a0f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="AWS問題集"/>
+<title>AWS 問題集 v1.0.3</title>
+<style>
+:root {
+  /* Theme variables (default: dark) */
+  --bg0:#070a0f; --bg1:#0c121b; --panel:#101a26; --panel2:#0d1620;
+  --line:#1a2a3a; --text:#e6eef7; --muted:#a9b6c5; --accent:#4ea1ff; --bad:#ff5a6b; --good:#52d27d;
+  --btn:#122235;
+  --pagebg: radial-gradient(1200px 800px at 50% -100px,#18283c 0%,var(--bg0) 55%,#000 100%);
+  --barbg: rgba(6,10,15,.78);
+  --barborder: rgba(255,255,255,.06);
+}
 
-  <p><strong>思想一文：</strong><br>
-    AWSでは「障害を防ぐ」のではなく、「障害が起きてもサービスを止めない構造」を設計する。
-  </p>
+/* Light theme */
+body[data-theme="light"]{
+  --bg0:#f6f7fb; --bg1:#ffffff; --panel:#ffffff; --panel2:#f2f4f8;
+  --line:#d8dde6; --text:#121722; --muted:#4a5568;
+  --accent:#1d6fff; --bad:#d53a4a; --good:#1f8f52;
+  --btn:#eef2f7;
+  --pagebg: linear-gradient(180deg,#ffffff 0%,#f4f6fb 55%,#eef1f6 100%);
+  --barbg: rgba(255,255,255,.80);
+  --barborder: rgba(18,23,34,.12);
+}
 
-  <hr style="border:0;border-top:1px solid #333;margin:1.2rem 0;">
+/* Beige theme */
+body[data-theme="beige"]{
+  --bg0:#f5f1e8; --bg1:#fffdf8; --panel:#fffdf8; --panel2:#f5efe3;
+  --line:#d7cfc1; --text:#1a1a1a; --muted:#5a544a;
+  --accent:#2a7de1; --bad:#c83a47; --good:#21824f;
+  --btn:#f1eadc;
+  --pagebg: linear-gradient(180deg,#fffdf8 0%,#f5f1e8 60%,#efe6d6 100%);
+  --barbg: rgba(255,253,248,.82);
+  --barborder: rgba(26,26,26,.12);
+}
 
-  <h3 style="margin:0 0 .6rem;">問題①（基本）</h3>
-  <p>Webサービスの可用性を高めたい。AWSの思想に最も沿った設計はどれか。</p>
-  <ol>
-    <li>A. 高性能なEC2を1台用意する</li>
-    <li>B. 定期的にバックアップを取得する</li>
-    <li><strong>C. 複数AZに分散し、自動的に切り替わる構成にする</strong></li>
-    <li>D. 障害時の運用手順書を作成する</li>
-  </ol>
-  <p><strong>答え：</strong>C</p>
-  <p><strong>解説：</strong><br>
-    障害は必ず起きる前提。人が判断して復旧する設計は遅く、破綻しやすい。<br>
-    AWSは「壊れても自動で継続できる構造（冗長＋自動切替）」を評価する。
-  </p>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust: 100%; text-size-adjust: 100%;}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;background:var(--pagebg);color:var(--text); -webkit-text-size-adjust: 100%; text-size-adjust: 100%;}
+header{position:sticky;top:0;z-index:10;background:var(--barbg);backdrop-filter: blur(10px);border-bottom:1px solid var(--barborder);}
+.topbar{max-width:1200px;margin:0 auto;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+select,button,input{font:inherit}
+.sel{background:var(--panel2);color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;}
+.btn{background:var(--btn);color:var(--text);border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:10px 14px;cursor:pointer}
+.btn:hover{border-color:rgba(255,255,255,.22)}
+.btn{ white-space:nowrap; }
+.btn:disabled{opacity:.45;cursor:not-allowed;border-color:rgba(255,255,255,.08)}
+.btn.primary{background:linear-gradient(180deg,#2f80ff,#1c63d8);border-color:rgba(78,161,255,.35)}
 
-  <hr style="border:0;border-top:1px solid #333;margin:1.2rem 0;">
+/* Light/Beige themes: make key navigation buttons slightly darker for readability */
+body[data-theme="light"] #toggleExplainBtn,
+body[data-theme="light"] #prevBtn,
+body[data-theme="light"] #nextBtn{
+  background: #d6e0e8;
+  border-color: rgba(18,23,34,.22);
+}
+body[data-theme="light"] #toggleExplainBtn:hover,
+body[data-theme="light"] #prevBtn:hover,
+body[data-theme="light"] #nextBtn:hover{
+  border-color: rgba(18,23,34,.32);
+}
+body[data-theme="beige"] #toggleExplainBtn,
+body[data-theme="beige"] #prevBtn,
+body[data-theme="beige"] #nextBtn{
+  background: #e1d6c6;
+  border-color: rgba(26,26,26,.20);
+}
+body[data-theme="beige"] #toggleExplainBtn:hover,
+body[data-theme="beige"] #prevBtn:hover,
+body[data-theme="beige"] #nextBtn:hover{
+  border-color: rgba(26,26,26,.30);
+}
+.badge{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--muted);}
+.tag{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(78,161,255,.12);border:1px solid rgba(78,161,255,.22);color:var(--text);font-size:12px;margin-right:6px;margin-top:6px}
+.tagRow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+main{max-width:1200px;margin:0 auto;padding:18px 12px 90px;}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px;box-shadow: 0 20px 60px rgba(0,0,0,.35);}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.stem{font-size:18px;line-height:1.65;margin:10px 0 14px;white-space:pre-wrap}
+.choice{display:flex;gap:12px;align-items:flex-start;background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;margin:10px 0}
+.choice:hover{border-color:rgba(255,255,255,.18)}
+.choice .k{min-width:28px;height:28px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:700}
+.choice .t{line-height:1.55;white-space:pre-wrap}
+.sep{height:1px;background:rgba(255,255,255,.08);margin:14px 0}
+.footerbar{position:fixed;left:0;right:0;bottom:0;background:var(--barbg);backdrop-filter: blur(10px);border-top:1px solid var(--barborder);}
+.footerbar .inner{max-width:1200px;margin:0 auto;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.small{font-size:12px;color:var(--muted)}
+.panel{border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:12px 14px;background:rgba(0,0,0,.18);white-space:pre-wrap}
+.panel.good{border-color:rgba(82,210,125,.35)}
+.panel.bad{border-color:rgba(255,90,107,.35)}
+.hidden{display:none !important}
+kbd{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:8px;padding:2px 6px;font-size:12px}
+/* Modal */
+.modalMask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
+body[data-theme="light"] .modalMask{background:rgba(0,0,0,.28)}
+body[data-theme="beige"] .modalMask{background:rgba(0,0,0,.28)}
+/* v1.0.1b: modal default size a bit smaller (PC) + never exceed viewport */
+.modal{width:min(840px,calc(100vw - 24px));max-height:82vh;max-height:calc(100dvh - 24px);overflow:auto;background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 30px 90px rgba(0,0,0,.6)}
+.modal .head{display:flex;gap:10px;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--panel);background:color-mix(in srgb, var(--panel) 88%, transparent);backdrop-filter: blur(10px);padding:10px;border-radius:14px;border:1px solid var(--line)}
+.modal .list{margin-top:10px}
+/* ===== Glossary readability tuning ===== */
+.modal{color:var(--text);}
+.modal .head{border-color:var(--line);}
+.modal .list{margin-top:10px;}
+.item{padding:10px 12px;margin:8px 0;}
+.item .tt{color:var(--text);}
+.item .dd{color:rgba(230,238,247,.88);margin-top:4px;line-height:1.45;}
+.stem{line-height:1.6;}
 
-  <h3 style="margin:0 0 .6rem;">問題②（ひっかけ）</h3>
-  <p>次のうち、AWSの可用性思想（③）に反している考え方はどれか。</p>
-  <ol>
-    <li>A. 障害を前提に設計する</li>
-    <li>B. 冗長構成を採用する</li>
-    <li>C. 自動的に切り替わる仕組みを用意する</li>
-    <li><strong>D. サーバを強化すれば障害は起きないと考える</strong></li>
-  </ol>
-  <p><strong>答え：</strong>D</p>
-  <p><strong>解説：</strong><br>
-    「強い1台」は単一障害点（SPOF）になりやすい。性能強化ではなく、壊れても続く構造が本質。
-  </p>
+/* Glossary add panel: keep visible while scrolling list */
+.modal{display:flex;flex-direction:column;}
+.modal .list{flex:1; overflow:auto; padding-right:4px;}
+.glossAddPanel{position:sticky; top:66px; z-index:5; margin-top:10px; background:var(--panel);background:color-mix(in srgb, var(--panel) 92%, transparent); backdrop-filter: blur(10px);}
+.glossAddPanel.isClosed{display:none;}
+.glossAddPanel .row{flex-wrap:wrap;}
+.glossAddPanel .sel{min-width:180px;}
+@media (max-width: 520px){
+  .glossAddPanel{top:58px;}
+  .glossAddPanel #glossNewTerm{width:100% !important;}
+  .glossAddPanel #glossNewDesc{min-width:0 !important;}
+  .glossAddPanel #glossNewTags{min-width:0 !important;}
+}
+.item{padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--panel2);margin:10px 0;cursor:pointer}
+.item:hover{border-color:var(--accent);border-color:color-mix(in srgb, var(--accent) 35%, var(--line));}
+.item .tt{font-weight:700}
+.item .dd{color:var(--muted);margin-top:6px;white-space:pre-wrap}
+/* ===== iPhone / small-screen tuning ===== */
+:root{
+  --safe-b: env(safe-area-inset-bottom);
+  --safe-t: env(safe-area-inset-top);
+  --safe-l: env(safe-area-inset-left);
+  --safe-r: env(safe-area-inset-right);
+}
+/* iOS: prevent "tap highlight" glare */
+*{ -webkit-tap-highlight-color: transparent; }
+body{ padding-left: var(--safe-l); padding-right: var(--safe-r); }
 
-  <hr style="border:0;border-top:1px solid #333;margin:1.2rem 0;">
+main{ padding-bottom: calc(90px + var(--safe-b)); }
 
-  <h3 style="margin:0 0 .6rem;">★必須用語（思想③）</h3>
-  <ul>
-    <li><strong>可用性（Availability）</strong>：サービスを止めずに提供し続けられる性質</li>
-    <li><strong>単一障害点（SPOF）</strong>：そこが壊れると全体が止まる一点</li>
-    <li><strong>冗長化</strong>：壊れても代替があるように重ねる設計</li>
-    <li><strong>フェイルオーバ</strong>：障害時に自動で待機系へ切り替えること</li>
-    <li><strong>マルチAZ</strong>：複数AZに分散してAZ障害でも継続する設計</li>
-  </ul>
+/* Bottom bar: avoid Home indicator overlap */
+.footerbar{ padding-bottom: var(--safe-b); }
+.footerbar .inner{ padding-bottom: calc(10px + var(--safe-b)); }
+
+/* Small screens */
+@media (max-width: 520px){
+  html{ font-size:14px; } /* 全体を少しだけ縮める */
+  header{ padding-top: var(--safe-t); }
+  .topbar{ gap:8px; padding:8px 10px; }
+
+  /* iOS zoom対策：inputは16px維持（.selが13pxを上書きしてズームするのを防ぐ） */
+  input{ font-size:16px; }
+  input.sel{ font-size:16px; }
+  .sel,.btn{ font-size:13px; }
+
+  .sel,.btn{ padding:8px 10px; border-radius:12px; }
+  .badge{ padding:6px 8px; font-size:12px; }
+
+  .stem{ font-size:14px; line-height:1.7; }
+  .choice{ padding:10px 10px; }
+  .choice .t{ font-size:14px; }
+
+  /* ラジオ/チェックは少しだけ大きく（押しやすさ維持） */
+  .choice input{ width:20px; height:20px; margin-top:2px; }
+
+  /* --- v1.0.1: iPhone top bar layout fixes (prevent badge squish) --- */
+  .topbar{ flex-wrap:wrap; overflow:visible; }
+  .topbar::-webkit-scrollbar{ display:none; }
+
+  /* 1st row: chapter / mode / theme */
+  #chapterSel{ order:1; flex:1 1 32%; min-width:0; }
+  #modeSel{ order:2; flex:1 1 32%; min-width:0; }
+  #themeSel{ order:3; flex:1 1 32%; min-width:0; }
+
+  /* 2nd row: glossary / history / status */
+  #glossBtn{ order:4; }
+  #histBtn{ order:5; }
+  #statusBadge{ order:6; flex:1 1 auto; min-width:0; white-space:nowrap; }
+
+  /* Make selects a bit tighter on iPhone */
+  .topbar .sel{ padding:8px 9px; }
+
+  /* --- v1.0.1: bottom filter bar wrap (no overflow) --- */
+  .footerbar .row{ flex-wrap:wrap; overflow:visible; -webkit-overflow-scrolling:touch; }
+  .footerbar .row::-webkit-scrollbar{ display:none; }
+  .footerbar .row .btn{ flex:1 1 45%; }
+
+  /* --- v1.0.1: modal width on iPhone (prevent right cut) --- */
+  .modalMask{ padding:8px; }
+  .modal{ width: calc(100vw - 16px); max-width: calc(100vw - 16px); }
+  .modal .head{ flex-wrap:wrap; gap:8px; }
+
+   main .card .row{ flex-wrap:wrap; }
+   main .card .row .btn{ flex:1 1 45%; } /* 2列っぽく均等 */
+
+  .card{ padding:14px; }
+  .modal{ max-height: calc(85vh - var(--safe-b)); }
+}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <select id="chapterSel" class="sel"></select>
+    <select id="modeSel" class="sel">
+      <option value="normal">通常</option>
+      <option value="random">ランダム</option>
+    </select>
+    <select id="themeSel" class="sel" title="背景テーマ">
+      <option value="dark">黒</option>
+      <option value="light">白</option>
+      <option value="beige">ベージュ</option>
+    </select>
+    <button id="glossBtn" class="btn">用語</button>
+    <button id="histBtn" class="btn">履歴</button>
+    <span id="statusBadge" class="badge">正解 0（回答済 0） / 0問</span>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="meta">
+      <span id="qTitle" class="badge">-</span>
+      <span id="qType" class="badge">-</span>
+      <span id="qState" class="badge">-</span>
+    </div>
+
+    <div id="qStem" class="stem">読み込み中...</div>
+
+    <div id="choices"></div>
+
+    <div class="sep"></div>
+
+    <div class="row">
+      <button id="judgeBtn" class="btn primary">判定</button>
+      <button id="toggleExplainBtn" class="btn">解説を表示</button>
+      <button id="prevBtn" class="btn">前へ</button>
+      <button id="nextBtn" class="btn">次へ</button>
+    </div>
+
+
+    <div id="resultPanel" class="panel hidden" style="margin-top:12px"></div>
+    <div id="answerPanel" class="panel hidden" style="margin-top:12px"></div>
+
+    <div class="small" style="margin-top:10px">
+      ショートカット： <kbd>←</kbd>/<kbd>→</kbd> 移動、<kbd>J</kbd> 判定、<kbd>E</kbd> 解説、<kbd>G</kbd> 用語、<kbd>H</kbd> 履歴
+    </div>
+  </div>
+</main>
+
+<div class="footerbar">
+  <div class="inner">
+    <div class="row">
+      <button id="topBtn" class="btn">先頭へ</button>
+      <button id="wrongFilterBtn" class="btn">×だけ（フィルタ）</button>
+      <button id="unansweredFilterBtn" class="btn">未回答だけ（フィルタ）</button>
+      <button id="clearFilterBtn" class="btn">フィルタ解除</button>
+    </div>
+    <div class="small">※ 状態はブラウザに保存（localStorage）</div>
+  </div>
 </div>
-<div class="box" style="margin-top:2rem;">
-  <h2 style="margin-top:0;">② 人に鍵を持たせるな</h2>
 
-  <p><strong>思想一文：</strong><br>
-    AWSでは、人が長期間使う「固定の認証情報」は事故の原因と考える。
-    必要なときに、必要な権限だけを、一時的に渡す設計が前提である。
-  </p>
+<!-- Glossary Modal -->
+<div id="glossMask" class="modalMask">
+  <div class="modal">
+    <div class="head">
+      <div class="row">
+        <span class="badge">用語（牽引）</span>
+        <input id="glossSearch" class="sel" style="width:min(420px,100%)" placeholder="検索（例：EC2）"/>
+      </div>
+      <div class="row"><button class="btn" id="glossToggleAddBtn">追加フォームを隠す</button><button class="btn" id="glossExportUserBtn">ユーザー用語Export</button><button class="btn" id="glossClose">閉じる</button></div>
+    </div>
+    <div class="panel glossAddPanel">
+      <div class="row" style="gap:8px">
+        <input id="glossNewTerm" class="sel" style="width:min(260px,100%)" placeholder="右クリック選択→ここに入ります（用語）"/>
+        <input id="glossNewDesc" class="sel" style="flex:1;min-width:240px" placeholder="説明（短くでOK）"/>
+      </div>
+      <div class="row" style="gap:8px;margin-top:8px">
+        <span class="small">タグ：</span>
+        <input id="glossNewTags" class="sel" style="flex:1;min-width:220px" placeholder="例：IAM, EC2, NW（カンマ区切り）"/>
+        <button class="btn" id="tagIAM">IAM</button>
+        <button class="btn" id="tagEC2">EC2</button>
+        <button class="btn" id="tagST">ST</button>
+        <button class="btn" id="tagNW">NW</button>
+        <button class="btn" id="tagDB">DB</button>
+        <button class="btn" id="tagAI">AI</button>
+        <button class="btn" id="tagOTHER">OTHER</button>
+        <button id="glossAddBtn" class="btn primary">追加</button>
+      </div>
+      <div class="small" style="margin-top:8px">※ 右クリックで問題文の選択語を自動入力できます（選択→右クリック）</div>
+    </div>
 
-  <hr style="border:0;border-top:1px solid #333;margin:1.2rem 0;">
-
-  <h3 style="margin:0 0 .6rem;">問題①（基本）</h3>
-  <p>EC2からS3へアクセスさせたい。AWSの思想に最も沿った方法はどれか。</p>
-  <ol>
-    <li>A. アクセスキーをEC2に直接保存する</li>
-    <li>B. 環境変数にIAMユーザーの認証情報を設定する</li>
-    <li><strong>C. IAMロールをEC2に割り当てる</strong></li>
-    <li>D. S3バケットを全公開にする</li>
-  </ol>
-  <p><strong>答え：</strong>C</p>
-  <p><strong>解説：</strong><br>
-    アクセスキーの埋め込みは漏洩リスクが高い。
-    IAMロールを使えば、認証情報はAWSが自動で管理・ローテーションする。
-  </p>
-
-  <hr style="border:0;border-top:1px solid #333;margin:1.2rem 0;">
-
-  <h3 style="margin:0 0 .6rem;">問題②（ひっかけ）</h3>
-  <p>次のうち、AWSの認証思想（②）に反している考え方はどれか。</p>
-  <ol>
-    <li>A. 最小権限でアクセスを許可する</li>
-    <li>B. 必要なときだけ一時的に権限を与える</li>
-    <li>C. ロールを使って認証情報をAWSに任せる</li>
-    <li><strong>D. 長期間有効なアクセスキーを安全に保管して使う</strong></li>
-  </ol>
-  <p><strong>答え：</strong>D</p>
-  <p><strong>解説：</strong><br>
-    「安全に保管しているつもり」が最も危険。
-    人が鍵を管理する前提そのものが、AWS思想では否定されている。
-  </p>
-
-  <hr style="border:0;border-top:1px solid #333;margin:1.2rem 0;">
-
-  <h3 style="margin:0 0 .6rem;">★必須用語（思想②）</h3>
-  <ul>
-    <li><strong>IAMロール</strong>：一時的な権限をAWSが自動で付与する仕組み</li>
-    <li><strong>STS</strong>：一時的な認証情報を発行するサービス</li>
-    <li><strong>最小権限</strong>：必要最小限の操作だけを許可する考え方</li>
-    <li><strong>アクセスキー</strong>：漏洩リスクのある固定認証情報</li>
-    <li><strong>一時認証</strong>：期限付きで使える認証方式</li>
-  </ul>
+    <div id="glossList" class="list"></div>
+  </div>
 </div>
+
+<!-- History Modal -->
+<div id="histMask" class="modalMask">
+  <div class="modal">
+    <div class="head">
+      <div class="row">
+        <span class="badge">履歴一覧</span>
+        <select id="histFilter" class="sel">
+          <option value="all">すべて</option>
+          <option value="unanswered">未回答</option>
+          <option value="wrong">×のみ</option>
+          <option value="correct">○のみ</option>
+          <option value="answered">回答済</option>
+        </select>
+        <input id="histSearch" class="sel" style="width:min(420px,100%)" placeholder="検索（問題文の一部）"/>
+      </div>
+      <button class="btn" id="histClearBtn">履歴クリア</button>
+      <button class="btn" id="histCopyAllBtn">全コピー</button>
+      <button class="btn" id="histExportBtn">エクスポート</button>
+      <button class="btn" id="histClose">閉じる</button>
+    </div>
+    <div id="histList" class="list"></div>
+  </div>
+</div>
+
+
+<!-- 外部JSON専用版: questions.json / glossary.json を同フォルダに置いてください -->
+
+<script>
+// --- iOS Safari / private mode safe storage wrapper ---
+const _storage = (()=>{
+  try {
+    const k = "__aws_quiz_test__";
+    window.localStorage.setItem(k, "1");
+    window.localStorage.removeItem(k);
+    return window.localStorage;
+  } catch (e) {
+    const mem = Object.create(null);
+    return {
+      getItem: (key) => (key in mem ? mem[key] : null),
+      setItem: (key, val) => { mem[key] = String(val); },
+      removeItem: (key) => { delete mem[key]; },
+    };
+  }
+})();
+const lsGet = (k) => _storage.getItem(k);
+const lsSet = (k, v) => _storage.setItem(k, v);
+const lsDel = (k) => _storage.removeItem(k);
+
+
+let QUESTIONS = [];
+let GLOSSARY = [];
+
+// 外部JSON専用：同フォルダの questions.json / glossary.json を fetch で読み込みます。
+// ※ file:// 直開きだと fetch が失敗することがあります。確実に動かすにはローカルサーバ推奨（例: python -m http.server）
+async function loadJson(url){
+  const base = new URL(".", location.href);
+  const target = new URL(url, base);
+  const r = await fetch(target, { cache: "no-store" });
+  if(!r.ok) throw new Error(`${url}: HTTP ${r.status}`);
+  return await r.json();
+}
+
+// --- data fix: infer missing answers from explanation (e.g., "答え‥A、D")
+function inferMissingAnswers(){
+  const re = /答え\s*[\.．…‥・]*\s*[:：]?\s*([A-EＡ-Ｅ][A-EＡ-Ｅ\s,、・\/]*)(?:\n|$)/;
+  for (const q of QUESTIONS){
+    if (Array.isArray(q.answer) && q.answer.length > 0) continue;
+    const exp = (q.explanation || q.explain || "").trim();
+    if (!exp) continue;
+    const m = exp.match(re);
+    if (!m) continue;
+    const letters = (m[1] || "").toUpperCase().match(/[A-E]/g) || [];
+    const uniq = Array.from(new Set(letters));
+    if (uniq.length === 0) continue;
+    q.answer = uniq;
+    if (!q.multi && uniq.length > 1) q.multi = true;
+    if (!q.required || q.required < 1) q.required = 1;
+    if (uniq.length > 1 && q.required === 1) q.required = uniq.length;
+  }
+}
+
+const LS_KEY = "aws_quiz_attempts_v1";
+const LS_GLOSS_USER = "aws_quiz_user_glossary_v1";
+const LS_THEME = "aws_quiz_theme_v1";
+
+let attempts = loadAttempts();
+let chapterSel = document.getElementById("chapterSel");
+let modeSel = document.getElementById("modeSel");
+let themeSel = document.getElementById("themeSel");
+let statusBadge = document.getElementById("statusBadge");
+
+let qIndex = 0;
+let activeList = [];
+let wrongOnly = false;
+let unansweredOnly = false;
+
+let showExplain = false;
+
+function el(id){ return document.getElementById(id); }
+
+function applyTheme(theme){
+  const t = (theme === 'light' || theme === 'beige') ? theme : 'dark';
+  document.body.setAttribute('data-theme', t);
+  const meta = document.querySelector("meta[name='theme-color']");
+  if (meta){
+    meta.setAttribute('content', t==='light' ? '#ffffff' : (t==='beige' ? '#fffdf8' : '#070a0f'));
+  }
+  try { lsSet(LS_THEME, t); } catch(e) {}
+  if (themeSel) themeSel.value = t;
+}
+
+
+function stripLeak(s) {
+  if (!s) return "";
+  return s.split(/\n/).filter(line => !/^\s*第\s*\d+\s*章/.test(line.trim())).join("\n").trim();
+}
+
+function loadAttempts() {
+  try {
+    const raw = lsGet(LS_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch(e) {
+    return {};
+  }
+}
+function saveAttempts() {
+  try { lsSet(LS_KEY, JSON.stringify(attempts)); } catch(e) {}
+}
+
+
+function normalizeTags(s){
+  if (!s) return [];
+  return String(s).split(",").map(x=>x.trim()).filter(Boolean).map(x=>x.toUpperCase());
+}
+function loadUserGlossary(){
+  try { return JSON.parse(lsGet(LS_GLOSS_USER) || "[]"); } catch(e){ return []; }
+}
+function saveUserGlossary(list){
+  try { lsSet(LS_GLOSS_USER, JSON.stringify(list||[])); } catch(e) {}
+}
+function exportUserGlossaryJson(){
+  const rows = loadUserGlossary();
+  const payload = { exportedAt: new Date().toISOString(), rows };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "aws_user_glossary.json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+
+function buildChapterOptions() {
+  const chs = Array.from(new Set(QUESTIONS.map(q=>q.chapter))).sort((a,b)=>a-b);
+  chapterSel.innerHTML = "";
+  const optAll = document.createElement("option");
+  optAll.value = "0"; optAll.textContent = "全章";
+  chapterSel.appendChild(optAll);
+  for (const ch of chs) {
+    const o = document.createElement("option");
+    o.value = String(ch);
+    o.textContent = (Number(ch)===999) ? "独自問題" : `第${ch}章`;
+    chapterSel.appendChild(o);
+  }
+}
+
+function getBaseList() {
+  const ch = parseInt(chapterSel.value,10);
+  let base = QUESTIONS.slice();
+  if (ch && !isNaN(ch)) base = base.filter(q=>q.chapter===ch);
+  base.sort((a,b)=> (a.chapter-b.chapter) || (a.qnum-b.qnum));
+  return base;
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i=a.length-1;i>0;i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function applyMode() {
+  const mode = modeSel.value;
+  // 基本リスト（左プルダウン：全章 or 章指定）を取得
+  let list = getBaseList();
+
+  // 並び順（通常 / ランダム）
+  if (mode === "random") {
+    list = shuffle(list);
+  } else {
+    // "normal" は getBaseList() が章→問番号でソート済み
+  }
+
+  // 下部フィルタ（×だけ / 未回答だけ）
+  if (wrongOnly) {
+    list = list.filter(q => attempts[q.id] && attempts[q.id].answered && attempts[q.id].correct === false);
+  }
+  if (unansweredOnly) {
+    list = list.filter(q => !attempts[q.id] || !attempts[q.id].answered);
+  }
+
+  activeList = list;
+  if (qIndex >= activeList.length) qIndex = Math.max(0, activeList.length - 1);
+  updateStatus();
+  render();
+}
+
+function updateStatus() {
+  const total = activeList.length;
+  let answered=0, correct=0;
+  for (const q of activeList) {
+    const a = attempts[q.id];
+    if (a && a.answered) {
+      answered++;
+      if (a.correct) correct++;
+    }
+  }
+  const rate = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  statusBadge.textContent = `正解 ${correct}（回答済 ${answered} / 正解率 ${rate}%） / ${total}問`;
+}
+
+function setPanelsHidden() {
+  showExplain = false;
+  el("answerPanel").classList.add("hidden");
+  el("resultPanel").classList.add("hidden");
+  el("toggleExplainBtn").textContent = "解説を表示";
+}
+
+function updateNavButtons(){
+  const prev = el("prevBtn");
+  const next = el("nextBtn");
+  const has = activeList.length > 0;
+  if (!prev || !next) return;
+  prev.disabled = (!has || qIndex <= 0);
+  next.disabled = (!has || qIndex >= activeList.length - 1);
+}
+
+
+
+function render() {
+  if (!activeList.length) {
+    el("qTitle").textContent = "表示対象なし";
+    el("qType").textContent = "-";
+    el("qState").textContent = "-";
+    el("qStem").textContent = "表示対象の問題がありません。フィルタを解除するかモードを変更してください。";
+    el("choices").innerHTML = "";
+    setPanelsHidden();
+    updateNavButtons();
+    bindGlossRightClick();
+    return;
+  }
+  const q = activeList[qIndex];
+
+  const a = attempts[q.id];
+  const answered = a && a.answered;
+  const correct = answered ? a.correct : null;
+
+  const chLabel = (Number(q.chapter)===999) ? "独自問題" : `第${q.chapter}章`;
+  el("qTitle").textContent = `${chLabel} / 練習問題${q.qnum}`;
+  el("qType").textContent = q.multi ? `複数選択（${q.required}つ）` : "単一選択";
+  el("qState").textContent = !answered ? "未回答" : (correct ? "○ 正解" : "× 不正解");
+
+  el("qStem").textContent = stripLeak(q.stem);
+
+  const box = el("choices");
+  box.innerHTML = "";
+  const selected = (a && Array.isArray(a.selected)) ? a.selected : [];
+  for (const c of q.choices) {
+    const row = document.createElement("div");
+    row.className = "choice";
+    const inp = document.createElement("input");
+    inp.type = q.multi ? "checkbox" : "radio";
+    inp.name = "choice";
+    inp.value = c.key;
+    inp.checked = selected.includes(c.key);
+    inp.addEventListener("change", ()=>onSelect(q, inp.value, inp.checked));
+    const k = document.createElement("div");
+    k.className = "k";
+    k.textContent = c.key;
+    const t = document.createElement("div");
+    t.className = "t";
+    t.textContent = stripLeak(c.text);
+    row.appendChild(inp);
+    row.appendChild(k);
+    row.appendChild(t);
+    box.appendChild(row);
+  }
+
+  setPanelsHidden();
+  updateNavButtons();
+  bindGlossRightClick();
+}
+
+function onSelect(q, key, checked) {
+  let a = attempts[q.id] || {selected:[], answered:false, correct:false};
+  let sel = Array.isArray(a.selected) ? a.selected.slice() : [];
+  if (q.multi) {
+    if (checked) {
+      if (!sel.includes(key)) sel.push(key);
+    } else {
+      sel = sel.filter(x=>x!==key);
+    }
+  } else {
+    sel = [key];
+  }
+  a.selected = sel;
+  attempts[q.id] = a;
+  saveAttempts();
+}
+
+function judge() {
+  if (!activeList.length) return;
+  const q = activeList[qIndex];
+  const a = attempts[q.id] || {selected:[], answered:false, correct:false};
+  const sel = Array.isArray(a.selected) ? a.selected.slice() : [];
+  const ans = Array.isArray(q.answer) ? q.answer.slice() : [];
+  let ok = false;
+
+  if (!ans.length) {
+    ok = false;
+  } else {
+    const s1 = sel.slice().sort().join(",");
+    const s2 = ans.slice().sort().join(",");
+    ok = (s1===s2);
+  }
+  a.answered = true;
+  a.correct = ok;
+  a.answeredAt = Date.now();
+  attempts[q.id] = a;
+  saveAttempts();
+  updateStatus();
+
+  const panel = el("resultPanel");
+  panel.classList.remove("hidden");
+  panel.classList.toggle("good", ok);
+  panel.classList.toggle("bad", !ok);
+  const ansStr = ans.length ? ans.join(",") : "（未登録）";
+  panel.textContent = ok ? `○ 正解　あなた: ${sel.join(",") || "（未選択）"} / 正解: ${ansStr}`
+                         : `× 不正解　あなた: ${sel.join(",") || "（未選択）"} / 正解: ${ansStr}`;
+
+  el("qState").textContent = ok ? "○ 正解" : "× 不正解";
+
+  // ▼ v1.0.1: after judging, scroll to the answer/result area (mobile-friendly)
+  const ap = el("answerPanel");
+  const rp = el("resultPanel");
+  const target = (ap && !ap.classList.contains("hidden")) ? ap : rp;
+  if (target && target.scrollIntoView) {
+    target.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+
+function toggleExplain() {
+  if (!activeList.length) return;
+  const q = activeList[qIndex];
+  showExplain = !showExplain;
+  const p = el("answerPanel");
+
+  if (!showExplain) {
+    p.classList.add("hidden");
+    el("toggleExplainBtn").textContent = "解説を表示";
+    return;
+  }
+
+  el("toggleExplainBtn").textContent = "解説を隠す";
+  p.classList.remove("hidden");
+  const ansStr = (q.answer && q.answer.length) ? q.answer.join(",") : "（未登録）";
+  const exp = stripLeak(q.explanation || "（解説なし）");
+  p.textContent = `正解： ${ansStr}\n\n${exp}`;
+
+  // ▼ v1.0.1: when showing explanation, also scroll to the answer area
+  if (p && p.scrollIntoView) {
+    p.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+function go(delta) {
+  if (!activeList.length) return;
+  qIndex = Math.max(0, Math.min(activeList.length-1, qIndex + delta));
+  render();
+}
+
+// iPhone等で input にフォーカスすると Safari がズーム/レイアウト変更し、モーダルが"巨大化"して見えることがあるため
+// スマホ（coarse pointer または狭幅）では自動フォーカスしない。
+function shouldAutoFocusInModal(){
+  try{
+    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return false;
+    if (window.innerWidth && window.innerWidth <= 520) return false;
+  }catch(e){}
+  return true;
+}
+
+function openGloss() {
+  el("glossMask").style.display="flex";
+  initGlossAddToggle();
+  renderGloss();
+  if (shouldAutoFocusInModal()) el("glossSearch").focus();
+}
+function closeGloss() { el("glossMask").style.display="none"; }
+function renderGloss() {
+  const q = el("glossSearch").value.trim().toLowerCase();
+  const list = el("glossList");
+  list.innerHTML="";
+  const userGloss = loadUserGlossary();
+  const merged = [...GLOSSARY, ...userGloss];
+  const items = merged.filter(e=> !q || e.term.toLowerCase().includes(q) || (e.desc||"").toLowerCase().includes(q) || (Array.isArray(e.tags)? e.tags.join(",").toLowerCase().includes(q) : false));
+  for (const it of items) {
+    const div=document.createElement("div");
+    div.className="item";
+    const t=document.createElement("div"); t.className="tt"; t.textContent=it.term;
+    const d=document.createElement("div"); d.className="dd"; d.textContent=it.desc;
+    div.appendChild(t); div.appendChild(d);
+    // tags
+    if (Array.isArray(it.tags) && it.tags.length){
+      const tr = document.createElement("div");
+      tr.className = "tagRow";
+      for (const tg of it.tags){
+        const sp = document.createElement("span");
+        sp.className = "tag";
+        sp.textContent = tg;
+        tr.appendChild(sp);
+      }
+      div.appendChild(tr);
+    }
+    list.appendChild(div);
+  }
+  if (!items.length) {
+    const div=document.createElement("div");
+    div.className="item";
+    div.textContent="該当なし";
+    list.appendChild(div);
+  }
+}
+
+function openHist() {
+  el("histMask").style.display="flex";
+  renderHist();
+  if (shouldAutoFocusInModal()) el("histSearch").focus();
+}
+function closeHist() { el("histMask").style.display="none"; }
+function renderHist() {
+  const f = el("histFilter").value;
+  const q = el("histSearch").value.trim();
+  const list=el("histList");
+  list.innerHTML="";
+  const items = activeList.filter(qq=> {
+    const a=attempts[qq.id];
+    const answered=a && a.answered;
+    const ok=answered && a.correct===true;
+    const ng=answered && a.correct===false;
+    if (f==="unanswered" && answered) return false;
+    if (f==="wrong" && !ng) return false;
+    if (f==="correct" && !ok) return false;
+    if (f==="answered" && !answered) return false;
+    if (q) {
+      const hay = `${qq.chapter}章 練習問題${qq.qnum}\n${qq.stem}`.toLowerCase();
+      if (!hay.includes(q.toLowerCase())) return false;
+    }
+    return true;
+  });
+  for (const it of items) {
+    const a=attempts[it.id];
+    const answered=a && a.answered;
+    const tag = !answered ? "未回答" : (a.correct ? "○" : "×");
+    const div=document.createElement("div");
+    div.className="item";
+    div.addEventListener("click", ()=>{
+      const idx = activeList.findIndex(x=>x.id===it.id);
+      if (idx>=0) {
+        qIndex=idx;
+        closeHist();
+        render();
+      }
+    });
+    const t=document.createElement("div"); t.className="tt"; t.textContent=`[${tag}] 第${it.chapter}章 / 練習問題${it.qnum}`;
+    const d=document.createElement("div"); d.className="dd"; d.textContent=stripLeak(it.stem).slice(0,160);
+    div.appendChild(t); div.appendChild(d);
+    list.appendChild(div);
+  }
+  if (!items.length) {
+    const div=document.createElement("div");
+    div.className="item";
+    div.textContent="該当なし（フィルタ/検索条件を見直してください）";
+    list.appendChild(div);
+  }
+}
+
+// events
+chapterSel.addEventListener("change", ()=>{ qIndex=0; applyMode(); });
+modeSel.addEventListener("change", ()=>{ qIndex=0; applyMode(); });
+
+el("judgeBtn").addEventListener("click", judge);
+el("toggleExplainBtn").addEventListener("click", toggleExplain);
+el("prevBtn").addEventListener("click", ()=>go(-1));
+el("nextBtn").addEventListener("click", ()=>go(1));
+el("topBtn").addEventListener("click", ()=>{ qIndex=0; render(); });
+
+el("wrongFilterBtn").addEventListener("click", ()=>{ wrongOnly=true; unansweredOnly=false; qIndex=0; applyMode(); });
+el("unansweredFilterBtn").addEventListener("click", ()=>{ unansweredOnly=true; wrongOnly=false; qIndex=0; applyMode(); });
+el("clearFilterBtn").addEventListener("click", ()=>{ wrongOnly=false; unansweredOnly=false; qIndex=0; applyMode(); });
+
+el("glossBtn").addEventListener("click", openGloss);
+el("glossClose").addEventListener("click", closeGloss);
+el("glossMask").addEventListener("click", (e)=>{ if(e.target.id==="glossMask") closeGloss(); });
+el("glossSearch").addEventListener("input", renderGloss);
+
+// --- Glossary: add from UI ---
+function appendTagToInput(tag){
+  const inp = el("glossNewTags");
+  if (!inp) return;
+  const tags = normalizeTags(inp.value);
+  const t = String(tag||"").toUpperCase();
+  if (t && !tags.includes(t)) tags.push(t);
+  inp.value = tags.join(",");
+}
+
+el("tagIAM")?.addEventListener("click", ()=>appendTagToInput("IAM"));
+el("tagEC2")?.addEventListener("click", ()=>appendTagToInput("EC2"));
+el("tagST")?.addEventListener("click", ()=>appendTagToInput("ST"));
+el("tagNW")?.addEventListener("click", ()=>appendTagToInput("NW"));
+el("tagDB")?.addEventListener("click", ()=>appendTagToInput("DB"));
+el("tagAI")?.addEventListener("click", ()=>appendTagToInput("AI"));
+el("tagOTHER")?.addEventListener("click", ()=>appendTagToInput("OTHER"));
+
+el("glossAddBtn")?.addEventListener("click", ()=>{
+  const term = (el("glossNewTerm")?.value || "").trim();
+  const desc = (el("glossNewDesc")?.value || "").trim();
+  const tags = normalizeTags(el("glossNewTags")?.value || "");
+  if (!term || !desc){ alert("用語と説明を入力してください"); return; }
+
+  // 重複チェック（マスター＋ユーザー）
+  const user = loadUserGlossary();
+  const merged = [...GLOSSARY, ...user];
+  if (merged.some(x=> String(x.term).trim() === term)){
+    alert("同じ用語が既にあります（マスター/ユーザー含む）");
+    return;
+  }
+  user.push({ term, desc, tags });
+  saveUserGlossary(user);
+  el("glossNewTerm").value="";
+  el("glossNewDesc").value="";
+  el("glossNewTags").value="";
+  renderGloss();
+});
+
+el("glossExportUserBtn")?.addEventListener("click", exportUserGlossaryJson);
+
+// Glossary add form toggle (persist)
+const LS_GLOSS_ADD_OPEN = "aws_gloss_add_open_v1";
+function setGlossAddOpen(isOpen){
+  const panel = document.querySelector(".glossAddPanel");
+  const btn = el("glossToggleAddBtn");
+  if (!panel || !btn) return;
+  panel.classList.toggle("isClosed", !isOpen);
+  btn.textContent = isOpen ? "追加フォームを隠す" : "追加フォームを表示";
+  try { lsSet(LS_GLOSS_ADD_OPEN, isOpen ? "1" : "0"); } catch(e) {}
+}
+function initGlossAddToggle(){
+  const btn = el("glossToggleAddBtn");
+  if (!btn || btn.dataset.bound) return;
+  btn.dataset.bound = "1";
+  const open = (lsGet(LS_GLOSS_ADD_OPEN) ?? "1") !== "0";
+  setGlossAddOpen(open);
+  btn.addEventListener("click", ()=>{
+    const panel = document.querySelector(".glossAddPanel");
+    const nowOpen = panel ? !panel.classList.contains("isClosed") : true;
+    setGlossAddOpen(!nowOpen);
+  });
+}
+
+
+
+el("histBtn").addEventListener("click", openHist);
+el("histClose").addEventListener("click", closeHist);
+// --- History Export / Copy ---
+function buildHistoryRows(){
+  // attempts: { [qid]: {selected:[], answered:boolean, correct:boolean, answeredAt:number } }
+  const rows = [];
+  for (const q of QUESTIONS){
+    const a = attempts[q.id];
+    if (!a) continue;
+    rows.push({
+      id: q.id,
+      chapter: q.chapter,
+      qnum: q.qnum,
+      question: q.question,
+      selected: a.selected || [],
+      correct: !!a.correct,
+      answered: !!a.answered,
+      answeredAt: a.answeredAt || null,
+      answer: q.answer || []
+    });
+  }
+  // answeredAt昇順（古い→新しい）
+  rows.sort((x,y)=>(x.answeredAt||0)-(y.answeredAt||0));
+  return rows;
+}
+
+function exportHistoryJson(){
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    totalQuestions: QUESTIONS.length,
+    totalAttempts: Object.keys(attempts||{}).length,
+    rows: buildHistoryRows()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "aws_quiz_history.json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+
+function copyHistoryAll(){
+  const rows = buildHistoryRows();
+  const lines = [];
+  lines.push(`AWS Quiz 履歴エクスポート`);
+  lines.push(`exportedAt: ${new Date().toISOString()}`);
+  lines.push(`attempts: ${rows.length}`);
+  lines.push("");
+  for (const r of rows){
+    const dt = r.answeredAt ? new Date(r.answeredAt).toLocaleString() : "-";
+    const sel = (r.selected||[]).join(",");
+    const ans = (r.answer||[]).join(",");
+    lines.push(`【第${r.chapter}章 Q${r.qnum}】 ${r.correct ? "○" : "×"}  (${dt})`);
+    lines.push(`問題: ${r.question}`);
+    lines.push(`選択: ${sel} / 正解: ${ans}`);
+    lines.push(`id: ${r.id}`);
+    lines.push("");
+  }
+  const txt = lines.join("\n");
+  navigator.clipboard?.writeText(txt).then(()=>{
+    alert("履歴を全コピーしました（クリップボード）");
+  }).catch(()=>{
+    // fallback
+    const ta = document.createElement("textarea");
+    ta.value = txt;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+    alert("履歴を全コピーしました（クリップボード）");
+  });
+}
+
+
+  el("histCopyAllBtn")?.addEventListener("click", copyHistoryAll);
+  el("histExportBtn")?.addEventListener("click", exportHistoryJson);
+  el("histClearBtn")?.addEventListener("click", () => {
+    if(!confirm("履歴をすべて削除します。よろしいですか？")) return;
+    lsDel(LS_KEY);
+    attempts = {};
+    updateStatus();
+    renderHist();
+    closeHist();
+  });
+el("histMask").addEventListener("click", (e)=>{ if(e.target.id==="histMask") closeHist(); });
+el("histFilter").addEventListener("change", renderHist);
+el("histSearch").addEventListener("input", renderHist);
+
+
+// --- Right-click selection → Glossary add ---
+function openGlossWithSelection(){
+  const sel = (window.getSelection && window.getSelection().toString()) ? window.getSelection().toString().trim() : "";
+  if (!sel) return false;
+  openGloss();
+  // できるだけ短い語に（長文選択事故防止）
+  const term = sel.length > 60 ? sel.slice(0,60) : sel;
+  const tEl = el("glossNewTerm");
+  if (tEl) tEl.value = term;
+  // 既存検索にも反映すると探しやすい
+  const sEl = el("glossSearch");
+  if (sEl) sEl.value = term;
+  renderGloss();
+  // スマホでは自動フォーカスを避ける（iOS Safari のズーム/レイアウト変更対策）
+  if (shouldAutoFocusInModal()) setTimeout(()=>{ el("glossNewDesc")?.focus(); }, 0);
+  return true;
+}
+
+function bindGlossRightClick(){
+  const targets = [el("qStem"), el("choices")].filter(Boolean);
+  for (const t of targets){
+    if (t.dataset.rcBound) continue;
+    t.dataset.rcBound = "1";
+    t.addEventListener("contextmenu", (e)=>{
+      // 選択がある時だけ、右クリックを「用語追加」扱いにする
+      const ok = openGlossWithSelection();
+      if (ok){ e.preventDefault(); }
+    });
+  }
+}
+
+// shortcuts
+document.addEventListener("keydown",(e)=>{
+  if (e.key==="ArrowRight") { go(1); }
+  else if (e.key==="ArrowLeft") { go(-1); }
+  else if (e.key.toLowerCase()==="j") { judge(); }
+  else if (e.key.toLowerCase()==="e") { toggleExplain(); }
+  else if (e.key.toLowerCase()==="g") { openGloss(); }
+  else if (e.key.toLowerCase()==="h") { openHist(); }
+});
+
+
+async function init() {
+  try{
+    QUESTIONS = await loadJson("questions.json");
+    GLOSSARY  = await loadJson("glossary.json");
+  }catch(e){
+    console.error(e);
+    alert("questions.json / glossary.json の読み込みに失敗しました。\n\n・同じフォルダに配置されているか\n・file://直開きの場合はローカルサーバで開いているか（推奨: python -m http.server）\n\n詳細: " + (e && e.message ? e.message : e));
+    // 最低限の表示
+    QUESTIONS = [];
+    GLOSSARY = [];
+  }
+
+  inferMissingAnswers();
+
+  buildChapterOptions();
+  chapterSel.value = lsGet("aws_quiz_chapter_sel") || "0";
+  modeSel.value = lsGet("aws_quiz_mode_sel") || "normal";
+  const savedTheme = lsGet(LS_THEME) || "dark";
+  applyTheme(savedTheme);
+  chapterSel.addEventListener("change", ()=>lsSet("aws_quiz_chapter_sel", chapterSel.value));
+  modeSel.addEventListener("change", ()=>lsSet("aws_quiz_mode_sel", modeSel.value));
+  if (themeSel){
+    themeSel.value = lsGet(LS_THEME) || "dark";
+    themeSel.addEventListener("change", ()=> applyTheme(themeSel.value));
+  }
+  applyMode();
+}
+init();
+
+</script>
+</body>
+</html>
