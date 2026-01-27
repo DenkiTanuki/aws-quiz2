@@ -233,9 +233,8 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
       <span id="qTitle" class="badge">-</span>
       <span id="qType" class="badge">-</span>
       <span id="qState" class="badge">-</span>
+      <span id="qThoughtBadge" class="badge hidden">-</span>
     </div>
-
-    <div id="qThought" class="thoughtLine"></div>
 
     <div id="qStem" class="stem">読み込み中...</div>
 
@@ -572,8 +571,19 @@ function render() {
   el("qType").textContent = q.multi ? `複数選択（${q.required}つ）` : "単一選択";
   el("qState").textContent = !answered ? "未回答" : (correct ? "○ 正解" : "× 不正解");
 
-  // 思想（章テーマ）をヘッダ付近に表示（問題文には出さない）
+  // 思想（章テーマ）をヘッダ付近にバッジとして表示（問題文には出さない）
   const thought = q.thoughtTitle || q.thought || "";
+  const tb = el("qThoughtBadge");
+  if (tb){
+    if (thought){
+      tb.textContent = `思想：${thought}`;
+      tb.classList.remove("hidden");
+    }else{
+      tb.textContent = "-";
+      tb.classList.add("hidden");
+    }
+  }
+
   const qt = el("qThought");
   if (thought) { qt.textContent = `思想：${thought}`; qt.style.display = ""; }
   else { qt.textContent = ""; qt.style.display = "none"; }
