@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#070a0f"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="AWS問題集2 "/>
-<title>AWS 問題集2 v1.0.0</title>
+<meta name="apple-mobile-web-app-title" content="AWS問題集"/>
+<title>AWS 問題集 v1.0.3</title>
 <style>
 :root {
   /* Theme variables (default: dark) */
@@ -84,6 +84,8 @@ main{max-width:1200px;margin:0 auto;padding:18px 12px 90px;}
 .card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px;box-shadow: 0 20px 60px rgba(0,0,0,.35);}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.thoughtLine{margin-top:.6rem;color:var(--muted);font-size:.92rem;line-height:1.4;display:none;}
+
 .stem{font-size:18px;line-height:1.65;margin:10px 0 14px;white-space:pre-wrap}
 .choice{display:flex;gap:12px;align-items:flex-start;background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;margin:10px 0}
 .choice:hover{border-color:rgba(255,255,255,.18)}
@@ -232,6 +234,8 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
       <span id="qType" class="badge">-</span>
       <span id="qState" class="badge">-</span>
     </div>
+
+    <div id="qThought" class="thoughtLine"></div>
 
     <div id="qStem" class="stem">読み込み中...</div>
 
@@ -549,6 +553,7 @@ function render() {
     el("qTitle").textContent = "表示対象なし";
     el("qType").textContent = "-";
     el("qState").textContent = "-";
+    const qt = el("qThought"); qt.textContent = ""; qt.style.display = "none";
     el("qStem").textContent = "表示対象の問題がありません。フィルタを解除するかモードを変更してください。";
     el("choices").innerHTML = "";
     setPanelsHidden();
@@ -566,6 +571,13 @@ function render() {
   el("qTitle").textContent = `${chLabel} / 練習問題${q.qnum}`;
   el("qType").textContent = q.multi ? `複数選択（${q.required}つ）` : "単一選択";
   el("qState").textContent = !answered ? "未回答" : (correct ? "○ 正解" : "× 不正解");
+
+  // 思想（章テーマ）をヘッダ付近に表示（問題文には出さない）
+  const thought = q.thoughtTitle || q.thought || "";
+  const qt = el("qThought");
+  if (thought) { qt.textContent = `思想：${thought}`; qt.style.display = ""; }
+  else { qt.textContent = ""; qt.style.display = "none"; }
+
 
   el("qStem").textContent = stripLeak(q.stem);
 
