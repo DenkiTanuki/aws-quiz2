@@ -47,3 +47,54 @@
     <li><strong>マルチAZ</strong>：複数AZに分散してAZ障害でも継続する設計</li>
   </ul>
 </div>
+<div class="box" style="margin-top:2rem;">
+  <h2 style="margin-top:0;">② 人に鍵を持たせるな</h2>
+
+  <p><strong>思想一文：</strong><br>
+    AWSでは、人が長期間使う「固定の認証情報」は事故の原因と考える。
+    必要なときに、必要な権限だけを、一時的に渡す設計が前提である。
+  </p>
+
+  <hr style="border:0;border-top:1px solid #333;margin:1.2rem 0;">
+
+  <h3 style="margin:0 0 .6rem;">問題①（基本）</h3>
+  <p>EC2からS3へアクセスさせたい。AWSの思想に最も沿った方法はどれか。</p>
+  <ol>
+    <li>A. アクセスキーをEC2に直接保存する</li>
+    <li>B. 環境変数にIAMユーザーの認証情報を設定する</li>
+    <li><strong>C. IAMロールをEC2に割り当てる</strong></li>
+    <li>D. S3バケットを全公開にする</li>
+  </ol>
+  <p><strong>答え：</strong>C</p>
+  <p><strong>解説：</strong><br>
+    アクセスキーの埋め込みは漏洩リスクが高い。
+    IAMロールを使えば、認証情報はAWSが自動で管理・ローテーションする。
+  </p>
+
+  <hr style="border:0;border-top:1px solid #333;margin:1.2rem 0;">
+
+  <h3 style="margin:0 0 .6rem;">問題②（ひっかけ）</h3>
+  <p>次のうち、AWSの認証思想（②）に反している考え方はどれか。</p>
+  <ol>
+    <li>A. 最小権限でアクセスを許可する</li>
+    <li>B. 必要なときだけ一時的に権限を与える</li>
+    <li>C. ロールを使って認証情報をAWSに任せる</li>
+    <li><strong>D. 長期間有効なアクセスキーを安全に保管して使う</strong></li>
+  </ol>
+  <p><strong>答え：</strong>D</p>
+  <p><strong>解説：</strong><br>
+    「安全に保管しているつもり」が最も危険。
+    人が鍵を管理する前提そのものが、AWS思想では否定されている。
+  </p>
+
+  <hr style="border:0;border-top:1px solid #333;margin:1.2rem 0;">
+
+  <h3 style="margin:0 0 .6rem;">★必須用語（思想②）</h3>
+  <ul>
+    <li><strong>IAMロール</strong>：一時的な権限をAWSが自動で付与する仕組み</li>
+    <li><strong>STS</strong>：一時的な認証情報を発行するサービス</li>
+    <li><strong>最小権限</strong>：必要最小限の操作だけを許可する考え方</li>
+    <li><strong>アクセスキー</strong>：漏洩リスクのある固定認証情報</li>
+    <li><strong>一時認証</strong>：期限付きで使える認証方式</li>
+  </ul>
+</div>
