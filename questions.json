@@ -406,7 +406,7 @@
     "id": "7-1",
     "chapter": 7,
     "qnum": 1,
-    "thoughtTitle": "⑦ データは消える前提で守れ（バックアップは『戻せる』が本体）",
+    "thoughtTitle": "⑦ データは消える前提で守れ",
     "stem": "RDS を利用している。自動バックアップを有効化しているため、データ保護は十分だと考えている。この考え方の弱点として最も適切なものはどれか。",
     "choices": [
       {
@@ -430,14 +430,14 @@
       "B"
     ],
     "explanation": "思想⑦のポイントは『バックアップは取るだけでは不十分。実際に復元できることを確認して初めて価値になる』。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
     "id": "7-2",
     "chapter": 7,
     "qnum": 2,
-    "thoughtTitle": "⑦ データは消える前提で守れ（バックアップは『戻せる』が本体）",
+    "thoughtTitle": "⑦ データは消える前提で守れ",
     "stem": "S3 に重要データを保存している。リージョン障害レベルの災害も想定して耐性を高めたい。最も適切な構成はどれか。",
     "choices": [
       {
@@ -461,14 +461,14 @@
       "C"
     ],
     "explanation": "思想⑦では『消える前提』で守る。リージョン障害を想定するなら別リージョンへ複製する CRR が有効。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
     "id": "7-3",
     "chapter": 7,
     "qnum": 3,
-    "thoughtTitle": "⑦ データは消える前提で守れ（バックアップは『戻せる』が本体）",
+    "thoughtTitle": "⑦ データは消える前提で守れ",
     "stem": "EBS スナップショットを取得しているが、保管先リージョンは同一のままで運用している。最も懸念すべき点はどれか。",
     "choices": [
       {
@@ -492,14 +492,14 @@
       "C"
     ],
     "explanation": "思想⑦は『データは消える前提』。同一リージョンに依存すると、リージョン障害でバックアップごと使えないリスクが残る。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
     "id": "8-1",
     "chapter": 8,
     "qnum": 1,
-    "thoughtTitle": "⑧ ネットワークは信用するな（内部=安全は幻想）",
+    "thoughtTitle": "⑧ ネットワークは信用するな",
     "stem": "VPC 内の EC2 間通信について、最も適切な説明はどれか。",
     "choices": [
       {
@@ -523,14 +523,14 @@
       "C"
     ],
     "explanation": "思想⑧は『内部=安全は幻想』。侵入済み前提で、内部通信でも最小権限の制御を行う。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
     "id": "8-2",
     "chapter": 8,
     "qnum": 2,
-    "thoughtTitle": "⑧ ネットワークは信用するな（内部=安全は幻想）",
+    "thoughtTitle": "⑧ ネットワークは信用するな",
     "stem": "Security Group と Network ACL（NACL）の違いとして正しいものはどれか。",
     "choices": [
       {
@@ -554,14 +554,14 @@
       "B"
     ],
     "explanation": "Security Group はインスタンス（ENI）に付与するステートフルなフィルタ。NACL はサブネット境界で評価されるステートレスなフィルタ。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
     "id": "8-3",
     "chapter": 8,
     "qnum": 3,
-    "thoughtTitle": "⑧ ネットワークは信用するな（内部=安全は幻想）",
+    "thoughtTitle": "⑧ ネットワークは信用するな",
     "stem": "Zero Trust（常に検証する）に近い設計として最も適切なものはどれか。",
     "choices": [
       {
@@ -585,7 +585,7 @@
       "C"
     ],
     "explanation": "思想⑧では『境界を信じない』。認証（誰か）と認可（何ができるか）を複数レイヤーで検証する設計が Zero Trust に近い。",
-    "required": false,
+    "required": 1,
     "multi": false
   }
 ]
