@@ -1,5 +1,129 @@
 [
   {
+    "id": "1-1",
+    "chapter": 1,
+    "qnum": 1,
+    "thoughtTitle": "① 人は運用をミスる",
+    "stem": "Webサービスの障害対応を人手に頼りたくない。最もAWSの思想に沿った運用はどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "障害時に担当者へ電話し、手順書に従って復旧する"
+      },
+      {
+        "key": "B",
+        "text": "障害時にチャットで周知し、担当者が手動でスケールアウトする"
+      },
+      {
+        "key": "C",
+        "text": "CloudWatchアラームを起点に自動復旧（例：Auto Scaling/自動再起動）する"
+      },
+      {
+        "key": "D",
+        "text": "障害が起きないように高性能なEC2を1台に集約する"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "思想①は『人は運用をミスる』が前提。検知→判断→対応を人に任せず、監視と復旧を自動化する設計が本質。",
+    "required": 1,
+    "multi": false
+  },
+  {
+    "id": "1-2",
+    "chapter": 1,
+    "qnum": 2,
+    "thoughtTitle": "① 人は運用をミスる",
+    "stem": "毎日決まった時間に処理を実行してレポートをS3へ保存したい。人的ミスを減らす構成として最も適切なのはどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "担当者が毎日PCから手動で実行する"
+      },
+      {
+        "key": "B",
+        "text": "EC2にcronを設定し、担当者が定期的に結果を確認する"
+      },
+      {
+        "key": "C",
+        "text": "EventBridgeでスケジュール起動し、Lambdaで処理する"
+      },
+      {
+        "key": "D",
+        "text": "S3に保存したら後でまとめて処理する"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "思想①の要点は“手作業を前提にしない”。スケジュール実行はEventBridge＋Lambda等で自動化すると人的ミスが減る。",
+    "required": 1,
+    "multi": false
+  },
+  {
+    "id": "2-1",
+    "chapter": 2,
+    "qnum": 1,
+    "thoughtTitle": "② 人に鍵を持たせるな",
+    "stem": "EC2からS3へアクセスさせたい。長期的なアクセスキー管理を避ける最も適切な方法はどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "IAMユーザーを作成しアクセスキーをEC2に保存する"
+      },
+      {
+        "key": "B",
+        "text": "アクセスキーを環境変数に設定して利用する"
+      },
+      {
+        "key": "C",
+        "text": "IAMロールをEC2に付与し、一時認証情報でアクセスする"
+      },
+      {
+        "key": "D",
+        "text": "S3のバケットをパブリックにしてアクセスする"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "思想②は“恒久鍵を配らない”。EC2にはIAMロールを付与し、STS由来の一時認証情報でアクセスさせるのが基本。",
+    "required": 1,
+    "multi": false
+  },
+  {
+    "id": "2-2",
+    "chapter": 2,
+    "qnum": 2,
+    "thoughtTitle": "② 人に鍵を持たせるな",
+    "stem": "社内メンバーがAWS管理コンソールへ安全にログインしたい。各人にIAMユーザーを量産せず、認証を一元化したい。最も適切なのはどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "全員でrootアカウントを共有し、MFAだけ付ける"
+      },
+      {
+        "key": "B",
+        "text": "全員分のIAMユーザーを作成し、パスワードを配布する"
+      },
+      {
+        "key": "C",
+        "text": "IAM Identity CenterでSSOを構成し、権限はロールで付与する"
+      },
+      {
+        "key": "D",
+        "text": "アクセスキーを配布してCLIだけ使わせる"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "思想②では“人に恒久的な鍵を持たせない”。人のログインはIAM Identity Center（SSO）で一元化し、権限はロールで付与するのが安全。",
+    "required": 1,
+    "multi": false
+  },
+  {
     "id": "3-1",
     "chapter": 3,
     "qnum": 1,
@@ -182,285 +306,6 @@
       "D"
     ],
     "explanation": "「最初から最大で固定」はコスト増にもなり、需要変化に追従できない。\nAWSの発想は“読めない”を前提に、スケールアウト/インを自動で回すこと。",
-    "required": 1,
-    "multi": false
-  },
-  {
-    "id": "6-1",
-    "chapter": 6,
-    "qnum": 1,
-    "thoughtTitle": "⑥ サーバー管理は本質ではない",
-    "stem": "スタートアップが Web API を短期間で立ち上げたい。OSパッチ適用や冗長化対応に人手を割きたくない。最も適切な構成はどれか。",
-    "choices": [
-      {
-        "key": "A",
-        "text": "EC2（Amazon Linux）＋手動パッチ"
-      },
-      {
-        "key": "B",
-        "text": "EC2＋Auto Scaling＋ALB"
-      },
-      {
-        "key": "C",
-        "text": "Lambda＋API Gateway"
-      },
-      {
-        "key": "D",
-        "text": "EC2＋Docker＋cron"
-      }
-    ],
-    "answer": [
-      "C"
-    ],
-    "explanation": "思想⑥では、OS管理や冗長化運用を人が抱える設計を避ける。Lambda＋API Gatewayはサーバ管理が不要。",
-    "required": 1,
-    "multi": false
-  },
-  {
-    "id": "6-2",
-    "chapter": 6,
-    "qnum": 2,
-    "thoughtTitle": "⑥ サーバー管理は本質ではない",
-    "stem": "RDS を利用する主なメリットとして最も適切でないものはどれか。",
-    "choices": [
-      {
-        "key": "A",
-        "text": "OS管理が不要"
-      },
-      {
-        "key": "B",
-        "text": "バックアップの自動化"
-      },
-      {
-        "key": "C",
-        "text": "アプリケーションのバグ修正をAWSが行う"
-      },
-      {
-        "key": "D",
-        "text": "Multi-AZによる高可用性"
-      }
-    ],
-    "answer": [
-      "C"
-    ],
-    "explanation": "RDSはマネージドだが、アプリケーションの責任は利用者側にある（責任共有モデル）。",
-    "required": 1,
-    "multi": false
-  },
-  {
-    "id": "6-3",
-    "chapter": 6,
-    "qnum": 3,
-    "thoughtTitle": "⑥ サーバー管理は本質ではない",
-    "stem": "次のうち、思想⑥に最も反する設計はどれか。",
-    "choices": [
-      {
-        "key": "A",
-        "text": "DynamoDBを使いサーバレス化"
-      },
-      {
-        "key": "B",
-        "text": "Lambdaでイベント駆動処理"
-      },
-      {
-        "key": "C",
-        "text": "EC2にDB・API・バッチを集約"
-      },
-      {
-        "key": "D",
-        "text": "Fargateでコンテナ運用"
-      }
-    ],
-    "answer": [
-      "C"
-    ],
-    "explanation": "1台のEC2に責務を集約すると、管理負荷と障害影響が最大化する。",
-    "required": 1,
-    "multi": false
-  },
-  {
-    "id": "7-1",
-    "chapter": 7,
-    "qnum": 1,
-    "thoughtTitle": "⑦ データは消える前提で守れ",
-    "stem": "RDS を利用している。自動バックアップを有効化しているため、データ保護は十分だと考えている。この考え方の弱点として最も適切なものはどれか。",
-    "choices": [
-      {
-        "key": "A",
-        "text": "バックアップ保存期間が1日以上にできない"
-      },
-      {
-        "key": "B",
-        "text": "復元テスト（リストア）が行われていない可能性がある"
-      },
-      {
-        "key": "C",
-        "text": "Multi-AZ を設定すると自動バックアップが無効になる"
-      },
-      {
-        "key": "D",
-        "text": "暗号化を有効化するとバックアップが取得できない"
-      }
-    ],
-    "answer": [
-      "B"
-    ],
-    "explanation": "思想⑦のポイントは『バックアップは取るだけでは不十分。実際に復元できることを確認して初めて価値になる』。",
-    "required": 1,
-    "multi": false
-  },
-  {
-    "id": "7-2",
-    "chapter": 7,
-    "qnum": 2,
-    "thoughtTitle": "⑦ データは消える前提で守れ",
-    "stem": "S3 に重要データを保存している。リージョン障害レベルの災害も想定して耐性を高めたい。最も適切な構成はどれか。",
-    "choices": [
-      {
-        "key": "A",
-        "text": "S3 標準ストレージに保存する"
-      },
-      {
-        "key": "B",
-        "text": "S3 バージョニングのみを有効化する"
-      },
-      {
-        "key": "C",
-        "text": "Cross-Region Replication（CRR）を設定する"
-      },
-      {
-        "key": "D",
-        "text": "S3 へのアップロードをマルチパートにする"
-      }
-    ],
-    "answer": [
-      "C"
-    ],
-    "explanation": "思想⑦では『消える前提』で守る。リージョン障害を想定するなら別リージョンへ複製する CRR が有効。",
-    "required": 1,
-    "multi": false
-  },
-  {
-    "id": "7-3",
-    "chapter": 7,
-    "qnum": 3,
-    "thoughtTitle": "⑦ データは消える前提で守れ",
-    "stem": "EBS スナップショットを取得しているが、保管先リージョンは同一のままで運用している。最も懸念すべき点はどれか。",
-    "choices": [
-      {
-        "key": "A",
-        "text": "スナップショットは1つしか作成できない"
-      },
-      {
-        "key": "B",
-        "text": "スナップショットは増分であり復元できない"
-      },
-      {
-        "key": "C",
-        "text": "同一リージョン障害時にスナップショットへアクセスできない可能性がある"
-      },
-      {
-        "key": "D",
-        "text": "スナップショットは暗号化できない"
-      }
-    ],
-    "answer": [
-      "C"
-    ],
-    "explanation": "思想⑦は『データは消える前提』。同一リージョンに依存すると、リージョン障害でバックアップごと使えないリスクが残る。",
-    "required": 1,
-    "multi": false
-  },
-  {
-    "id": "8-1",
-    "chapter": 8,
-    "qnum": 1,
-    "thoughtTitle": "⑧ ネットワークは信用するな",
-    "stem": "VPC 内の EC2 間通信について、最も適切な説明はどれか。",
-    "choices": [
-      {
-        "key": "A",
-        "text": "VPC 内は信頼できるため、アプリケーション側の認証・認可は不要である"
-      },
-      {
-        "key": "B",
-        "text": "Security Group があるため、通信は自動的に暗号化される"
-      },
-      {
-        "key": "C",
-        "text": "内部通信であっても最小権限の通信制御（Security Group 等）が重要である"
-      },
-      {
-        "key": "D",
-        "text": "NACL が設定されていれば Security Group は不要である"
-      }
-    ],
-    "answer": [
-      "C"
-    ],
-    "explanation": "思想⑧は『内部=安全は幻想』。侵入済み前提で、内部通信でも最小権限の制御を行う。",
-    "required": 1,
-    "multi": false
-  },
-  {
-    "id": "8-2",
-    "chapter": 8,
-    "qnum": 2,
-    "thoughtTitle": "⑧ ネットワークは信用するな",
-    "stem": "Security Group と Network ACL（NACL）の違いとして正しいものはどれか。",
-    "choices": [
-      {
-        "key": "A",
-        "text": "Security Group はステートレスで、NACL はステートフルである"
-      },
-      {
-        "key": "B",
-        "text": "Security Group はインスタンス（ENI）に適用され、NACL はサブネットに適用される"
-      },
-      {
-        "key": "C",
-        "text": "NACL は許可ルールしか作れず、拒否ルールは作れない"
-      },
-      {
-        "key": "D",
-        "text": "Security Group はサブネット単位に適用される"
-      }
-    ],
-    "answer": [
-      "B"
-    ],
-    "explanation": "Security Group はインスタンス（ENI）に付与するステートフルなフィルタ。NACL はサブネット境界で評価されるステートレスなフィルタ。",
-    "required": 1,
-    "multi": false
-  },
-  {
-    "id": "8-3",
-    "chapter": 8,
-    "qnum": 3,
-    "thoughtTitle": "⑧ ネットワークは信用するな",
-    "stem": "Zero Trust（常に検証する）に近い設計として最も適切なものはどれか。",
-    "choices": [
-      {
-        "key": "A",
-        "text": "VPN 接続できた端末は、社内システムへ自由にアクセスできる"
-      },
-      {
-        "key": "B",
-        "text": "VPC 内の通信はすべて許可し、境界でのみ防御する"
-      },
-      {
-        "key": "C",
-        "text": "IAM の認可 + Security Group の最小許可 + アプリケーション認証を組み合わせる"
-      },
-      {
-        "key": "D",
-        "text": "NACL のみで全通信を制御する"
-      }
-    ],
-    "answer": [
-      "C"
-    ],
-    "explanation": "思想⑧では『境界を信じない』。認証（誰か）と認可（何ができるか）を複数レイヤーで検証する設計が Zero Trust に近い。",
     "required": 1,
     "multi": false
   }
