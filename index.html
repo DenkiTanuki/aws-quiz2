@@ -125,6 +125,23 @@ main{max-width:1200px;margin:0 auto;padding:18px 12px 90px;}
 .panel.bad{border-color:rgba(255,90,107,.35)}
 .hidden{display:none !important}
 kbd{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:8px;padding:2px 6px;font-size:12px}
+/* ===== Thought Map (Top) ===== */
+.mapWrap{max-width:1200px;margin:0 auto;padding:18px 12px 90px;}
+.mapHead{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px;}
+.mapTitle{font-size:20px;font-weight:800;letter-spacing:.2px;}
+.mapSub{font-size:12px;color:var(--muted);}
+.layerCard{border:1px solid rgba(255,255,255,.10);border-radius:18px;padding:14px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));margin:12px 0;}
+.layerCard h3{margin:0 0 10px;font-size:13px;color:var(--muted);font-weight:700;}
+.mapGrid{display:flex;flex-wrap:wrap;gap:10px;}
+.mapBtn{flex:1 1 240px;min-width:240px;text-align:left;padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.14);color:var(--text);cursor:pointer;}
+.mapBtn:hover{border-color:rgba(255,255,255,.22)}
+.mapBtn .n{font-weight:900;margin-right:6px;}
+.mapBtn .t{font-weight:700;}
+.mapBtn .d{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.35;}
+.mapActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+@media (max-width:520px){
+  .mapBtn{min-width:100%;}
+}
 /* Modal */
 .modalMask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
 body[data-theme="light"] .modalMask{background:rgba(0,0,0,.28)}
@@ -221,6 +238,7 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
 <header>
   <div class="topbar">
     <button id="filterToggleBtn" class="btn" title="フィルタ・表示設定を開閉">フィルタ・表示設定</button>
+    <button id="homeBtn" class="btn" title="思想マップ（トップ）へ戻る">思想マップ</button>
     <span id="filterSummary" class="badge mini">-</span>
     <button id="glossBtn" class="btn">用語</button>
     <button id="histBtn" class="btn">履歴</button>
@@ -268,6 +286,38 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
 </header>
 
 <main>
+  <section id="thoughtMapView" class="mapWrap">
+    <div class="mapHead">
+      <div class="mapTitle">AWS 12の思想マップ</div>
+      <div class="mapSub">人間の弱さ × AWSの設計哲学（クリックでその思想の問題だけ出題）</div>
+    </div>
+
+    <div class="layerCard">
+      <h3>Layer 4：価値・体験（ユーザーに出る）</h3>
+      <div class="mapGrid" id="mapLayer4"></div>
+    </div>
+    <div class="layerCard">
+      <h3>Layer 3：信頼・防御（壊れる／消える／侵入される前提）</h3>
+      <div class="mapGrid" id="mapLayer3"></div>
+    </div>
+    <div class="layerCard">
+      <h3>Layer 2：設計・運用（落ちても回る／証拠が残る／需要は読めない）</h3>
+      <div class="mapGrid" id="mapLayer2"></div>
+    </div>
+    <div class="layerCard">
+      <h3>Layer 1：人間対策（根）</h3>
+      <div class="mapGrid" id="mapLayer1"></div>
+    </div>
+
+    <div class="mapActions">
+      <button id="startAllBtn" class="btn primary" type="button">全問題で開始</button>
+      <button id="startUnansweredBtn" class="btn" type="button">未回答だけで開始</button>
+      <button id="startWrongBtn" class="btn" type="button">×だけで開始</button>
+    </div>
+    <div class="small" style="margin-top:8px">※ 章・ランダム・テーマ・思想バッジなどの詳細設定は、問題画面の「フィルタ・表示設定」からいつでも変更できます。</div>
+  </section>
+
+  <div id="quizView" class="hidden">
   <div class="card">
     <div class="meta">
       <span id="qTitle" class="badge">-</span>
@@ -296,6 +346,7 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
     <div class="small" style="margin-top:10px">
       ショートカット： <kbd>←</kbd>/<kbd>→</kbd> 移動、<kbd>J</kbd> 判定、<kbd>E</kbd> 解説、<kbd>G</kbd> 用語、<kbd>H</kbd> 履歴
     </div>
+  </div>
   </div>
 </main>
 
@@ -450,6 +501,96 @@ let activeThoughts = new Set(); // Set of normalized thoughtTitle
 let thoughtFilterMode = "any"; // "any"(OR) / "all"(AND)  ※現状はanyを使用
 
 let showExplain = false;
+
+// ===== Thought Map (Top screen) =====
+// 12思想の“表示名”をここで統一（questions.json の thoughtTitle と一致させるのが理想）
+// ※ まだ作っていない思想は、クリックしても「表示対象なし」になります（今後問題を足すと効いてきます）
+const THOUGHT_MASTER = {
+  1: { title: '人は運用をミスる（＝自動化せよ）', desc: '手作業の監視・判断・対応は必ず破綻する' },
+  2: { title: '人に鍵を持たせるな（＝一時認証）', desc: '恒久ID/パスワード運用は事故の元' },
+  3: { title: '障害は起きる前提で設計せよ（落ちても生き残る）', desc: '落ちない設計ではなく、落ちても継続する設計' },
+  4: { title: '証拠が残らない運用は犯罪と同じ（誰が・いつ・何をしたか）', desc: '統制不能＝設計ミス。後から検証できる状態にする' },
+  5: { title: 'スケールは人間に任せるな（需要は読めない前提）', desc: '需要予測は外れる前提。自動で増える／減る' },
+  6: { title: 'サーバー管理は本質ではない', desc: 'OS/パッチ/冗長化など価値を生まない作業を捨てる' },
+  7: { title: 'データは消える前提で守れ', desc: 'バックアップは「取ってるつもり」が一番危険' },
+  8: { title: 'ネットワークは信用するな', desc: '内部＝安全は幻想。ゼロトラスト的に考える' },
+  9: { title: '遅延はユーザー体験を殺す', desc: '遠い＝遅い。体験として死ぬ' },
+ 10: { title: '料金は技術問題である', desc: 'コスト最適化できない設計は失敗' },
+ 11: { title: '移行は一発では終わらない', desc: '現実の移行は段階的・泥臭い' },
+ 12: { title: '可観測性がないシステムは死んでいる', desc: '見えないものは直せない' },
+};
+
+function showThoughtMap(){
+  el('thoughtMapView')?.classList.remove('hidden');
+  el('quizView')?.classList.add('hidden');
+  // フィルタパネルが開いていたら閉じる（トップはスッキリ）
+  if (filterPanel && !filterPanel.classList.contains('hidden')) setFilterPanelOpen(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showQuizView(){
+  el('thoughtMapView')?.classList.add('hidden');
+  el('quizView')?.classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function buildThoughtMapUI(){
+  const l4 = el('mapLayer4');
+  const l3 = el('mapLayer3');
+  const l2 = el('mapLayer2');
+  const l1 = el('mapLayer1');
+  if (!l4 || !l3 || !l2 || !l1) return;
+  l4.innerHTML = ''; l3.innerHTML = ''; l2.innerHTML = ''; l1.innerHTML = '';
+
+  const makeBtn = (n)=>{
+    const info = THOUGHT_MASTER[n];
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mapBtn';
+    b.dataset.thoughtTitle = info.title;
+    b.innerHTML = `<div><span class="n">${String(n).padStart(2,'0')}</span><span class="t">${info.title}</span></div>` +
+                 `<div class="d">${info.desc}</div>`;
+    b.addEventListener('click', ()=>{
+      // 思想1つで開始（既存の思想バッジフィルタと同じ仕組みに流し込む）
+      activeThoughts = new Set([info.title]);
+      wrongOnly = false; unansweredOnly = false;
+      buildThoughtBar();
+      qIndex = 0;
+      applyMode();
+      showQuizView();
+    });
+    return b;
+  };
+
+  // Layer 4: 9-12
+  [9,10,11,12].forEach(n=> l4.appendChild(makeBtn(n)));
+  // Layer 3: 6-8
+  [6,7,8].forEach(n=> l3.appendChild(makeBtn(n)));
+  // Layer 2: 3-5
+  [3,4,5].forEach(n=> l2.appendChild(makeBtn(n)));
+  // Layer 1: 1-2
+  [1,2].forEach(n=> l1.appendChild(makeBtn(n)));
+
+  // 付属ボタン（全問題／未回答／×だけ）
+  el('startAllBtn')?.addEventListener('click', ()=>{
+    activeThoughts = new Set();
+    wrongOnly = false; unansweredOnly = false;
+    buildThoughtBar();
+    qIndex = 0; applyMode(); showQuizView();
+  });
+  el('startUnansweredBtn')?.addEventListener('click', ()=>{
+    activeThoughts = new Set();
+    wrongOnly = false; unansweredOnly = true;
+    buildThoughtBar();
+    qIndex = 0; applyMode(); showQuizView();
+  });
+  el('startWrongBtn')?.addEventListener('click', ()=>{
+    activeThoughts = new Set();
+    wrongOnly = true; unansweredOnly = false;
+    buildThoughtBar();
+    qIndex = 0; applyMode(); showQuizView();
+  });
+}
 
 function el(id){ return document.getElementById(id); }
 
@@ -1032,6 +1173,7 @@ el("wrongFilterBtn").addEventListener("click", ()=>{ wrongOnly=true; unansweredO
 el("unansweredFilterBtn").addEventListener("click", ()=>{ unansweredOnly=true; wrongOnly=false; qIndex=0; applyMode(); });
 el("clearFilterBtn").addEventListener("click", ()=>{ wrongOnly=false; unansweredOnly=false; qIndex=0; applyMode(); });
 
+el("homeBtn")?.addEventListener("click", showThoughtMap);
 el("glossBtn").addEventListener("click", openGloss);
 el("glossClose").addEventListener("click", closeGloss);
 el("glossMask").addEventListener("click", (e)=>{ if(e.target.id==="glossMask") closeGloss(); });
@@ -1256,6 +1398,10 @@ async function init() {
 
   buildChapterOptions();
   buildThoughtBar();
+  buildThoughtMapUI();
+  // 初期表示は思想マップ（トップ画面）
+  showThoughtMap();
+
   chapterSel.value = lsGet("aws_quiz_chapter_sel") || "0";
   modeSel.value = lsGet("aws_quiz_mode_sel") || "normal";
   const savedTheme = lsGet(LS_THEME) || "dark";
