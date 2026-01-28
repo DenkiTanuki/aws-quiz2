@@ -306,7 +306,7 @@
       "B"
     ],
     "explanation": "思想⑦のポイントは『バックアップは取るだけでは不十分。実際に復元できることを確認して初めて価値になる』。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
@@ -337,7 +337,7 @@
       "C"
     ],
     "explanation": "思想⑦では『消える前提』で守る。リージョン障害を想定するなら別リージョンへ複製する CRR が有効。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
@@ -368,7 +368,7 @@
       "C"
     ],
     "explanation": "思想⑦は『データは消える前提』。同一リージョンに依存すると、リージョン障害でバックアップごと使えないリスクが残る。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
@@ -399,7 +399,7 @@
       "C"
     ],
     "explanation": "思想⑧は『内部=安全は幻想』。侵入済み前提で、内部通信でも最小権限の制御を行う。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
@@ -430,7 +430,7 @@
       "B"
     ],
     "explanation": "Security Group はインスタンス（ENI）に付与するステートフルなフィルタ。NACL はサブネット境界で評価されるステートレスなフィルタ。",
-    "required": false,
+    "required": 1,
     "multi": false
   },
   {
@@ -461,7 +461,7 @@
       "C"
     ],
     "explanation": "思想⑧では『境界を信じない』。認証（誰か）と認可（何ができるか）を複数レイヤーで検証する設計が Zero Trust に近い。",
-    "required": false,
+    "required": 1,
     "multi": false
   }
 ]
