@@ -75,6 +75,8 @@ select,button,input{font:inherit}
 
 @media (max-width: 520px){
   .badge.mini{max-width:100%}
+  #filterSummary{flex:1 1 100%}
+  #filterToggleBtn{flex:0 0 auto}
 }
 
 /* Light/Beige themes: make key navigation buttons slightly darker for readability */
@@ -213,12 +215,32 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
   .modal{ max-height: calc(85vh - var(--safe-b)); }
 }
 
+
+/* ===== TOP / QUIZ two-mode UI ===== */
+.topScreen{
+  padding: 16px;
+}
+.topStartWrap{
+  display:flex;
+  justify-content:flex-start;
+  align-items:flex-start;
+  min-height: 55vh; /* big whitespace like screenshot */
+}
+.startBtn{
+  font-size: 28px;
+  padding: 10px 24px;
+  border-radius: 14px;
+}
+body.mode-top #topBtn{ display:none; }
+body.mode-quiz #filterPanel{ display:none; }
+body.mode-quiz #topScreen{ display:none; }
 </style>
 </head>
 <body>
 <header>
   <div class="topbar">
-    <button id="glossBtn" class="btn">用語</button>
+    <button id="topBtn" class="btn">TOP画面</button>
+<button id="glossBtn" class="btn">用語</button>
 <button id="histBtn" class="btn">履歴</button>
 <span id="statusBadge" class="badge">正解 0（回答済 0） / 0問</span>
   </div>
@@ -226,12 +248,7 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
   <!-- 折りたたみ：フィルタ／表示設定 -->
   <div id="filterPanel" class="filterPanel">
     <div class="filterGrid">
-      <div class="filterItem">
-        <div class="filterLabel">章</div>
-        <select id="chapterSel" class="sel"></select>
-      </div>
-
-      <div class="filterItem">
+<div class="filterItem">
         <div class="filterLabel">出題順</div>
         <select id="modeSel" class="sel">
           <option value="normal">通常</option>
@@ -263,6 +280,15 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
   </div>
 </header>
 
+<!-- TOP画面（設定 + 開始） -->
+<section id="topScreen" class="topScreen">
+  <div class="topStartWrap">
+    <button id="startBtn" class="startBtn">開始</button>
+  </div>
+</section>
+
+
+<section id="quizScreen" class="hidden">
 <main>
   <div class="card">
     <div class="meta">
@@ -294,6 +320,7 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
     </div>
   </div>
 </main>
+</section>
 
 
 
@@ -426,7 +453,7 @@ const LS_GLOSS_USER = "aws_quiz_user_glossary_v1";
 const LS_THEME = "aws_quiz_theme_v1";
 
 let attempts = loadAttempts();
-let chapterSel = document.getElementById("chapterSel");
+let chapterSel = null; // chapter dropdown removed
 let modeSel = document.getElementById("modeSel");
 let themeSel = document.getElementById("themeSel");
 let statusBadge = document.getElementById("statusBadge");
@@ -438,7 +465,34 @@ let unansweredOnly = false;
 
 // 思想フィルタ（バッジUI）
 let activeThoughts = new Set(); // Set of normalized thoughtTitle
-let thoughtFilterMode = "any"; // "any"(OR) / "all"(AND)  ※現状はanyを使用
+let thoughtFilterMode = "any"; 
+
+// ===== TOP / QUIZ mode =====
+let appMode = "top";
+
+function setAppMode(mode){
+  appMode = mode;
+  document.body.classList.toggle("mode-top", mode==="top");
+  document.body.classList.toggle("mode-quiz", mode==="quiz");
+  const top = el("topScreen");
+  const quiz = el("quizScreen");
+  if (top) top.classList.toggle("hidden", mode!=="top");
+  if (quiz) quiz.classList.toggle("hidden", mode!=="quiz");
+  const topBtn = el("topBtn");
+  if (topBtn) topBtn.style.display = (mode==="quiz") ? "inline-flex" : "none";
+}
+
+function startQuiz(){
+  // TOPで決めた条件を確定し、1問目から開始
+  qIndex = 0;
+  applyMode();
+  setAppMode("quiz");
+}
+
+function backToTop(){
+  setAppMode("top");
+}
+// "any"(OR) / "all"(AND)  ※現状はanyを使用
 
 let showExplain = false;
 
@@ -569,24 +623,10 @@ function buildThoughtBar(){
   hint.textContent = "※思想バッジで横断フィルタ";
   bar.appendChild(hint);
 }
-function buildChapterOptions() {
-  const chs = Array.from(new Set(QUESTIONS.map(q=>q.chapter))).sort((a,b)=>a-b);
-  chapterSel.innerHTML = "";
-  const optAll = document.createElement("option");
-  optAll.value = "0"; optAll.textContent = "全章";
-  chapterSel.appendChild(optAll);
-  for (const ch of chs) {
-    const o = document.createElement("option");
-    o.value = String(ch);
-    o.textContent = (Number(ch)===999) ? "独自問題" : `第${ch}章`;
-    chapterSel.appendChild(o);
-  }
-}
 
 function getBaseList() {
-  const ch = parseInt(chapterSel.value,10);
+  // 章プルダウンは廃止：常に全問題を対象
   let base = QUESTIONS.slice();
-  if (ch && !isNaN(ch)) base = base.filter(q=>q.chapter===ch);
   base.sort((a,b)=> (a.chapter-b.chapter) || (a.qnum-b.qnum));
   return base;
 }
@@ -937,7 +977,7 @@ function renderHist() {
 }
 
 // events
-chapterSel.addEventListener("change", ()=>{ qIndex=0; applyMode(); });
+});
 modeSel.addEventListener("change", ()=>{ qIndex=0; applyMode(); });
 
 el("judgeBtn").addEventListener("click", judge);
@@ -1154,6 +1194,12 @@ document.addEventListener("keydown",(e)=>{
 
 
 async function init() {
+
+// TOP/QUIZ two-mode
+el("startBtn")?.addEventListener("click", startQuiz);
+el("topBtn")?.addEventListener("click", backToTop);
+setAppMode("top");
+
   try{
     QUESTIONS = await loadJson("questions.json");
     GLOSSARY  = await loadJson("glossary.json");
@@ -1166,15 +1212,12 @@ async function init() {
   }
 
   inferMissingAnswers();
-
-  buildChapterOptions();
-  buildThoughtBar();
+buildThoughtBar();
   chapterSel.value = lsGet("aws_quiz_chapter_sel") || "0";
   modeSel.value = lsGet("aws_quiz_mode_sel") || "normal";
   const savedTheme = lsGet(LS_THEME) || "dark";
   applyTheme(savedTheme);
-  chapterSel.addEventListener("change", ()=>lsSet("aws_quiz_chapter_sel", chapterSel.value));
-  modeSel.addEventListener("change", ()=>lsSet("aws_quiz_mode_sel", modeSel.value));
+modeSel.addEventListener("change", ()=>lsSet("aws_quiz_mode_sel", modeSel.value));
   if (themeSel){
     themeSel.value = lsGet(LS_THEME) || "dark";
     themeSel.addEventListener("change", ()=> applyTheme(themeSel.value));
