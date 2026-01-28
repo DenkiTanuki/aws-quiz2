@@ -185,4 +185,46 @@
     "required": 1,
     "multi": false
   }
+  {
+    "id": "6-1",
+    "chapter": 6,
+    "thought": "⑥ サーバー管理は本質ではない",
+    "question": "スタートアップが Web API を短期間で立ち上げたい。OSパッチ適用や冗長化対応に人手を割きたくない。最も適切な構成はどれか。",
+    "choices": [
+      "EC2（Amazon Linux）＋手動パッチ",
+      "EC2＋Auto Scaling＋ALB",
+      "Lambda＋API Gateway",
+      "EC2＋Docker＋cron"
+    ],
+    "answer": 2,
+    "explanation": "思想⑥では、OS管理や冗長化運用を人が抱える設計を避ける。Lambda＋API Gatewayはサーバ管理が不要。"
+  }
+  {
+    "id": "6-2",
+    "chapter": 6,
+    "thought": "⑥ サーバー管理は本質ではない",
+    "question": "RDS を利用する主なメリットとして最も適切でないものはどれか。",
+    "choices": [
+      "OS管理が不要",
+      "バックアップの自動化",
+      "アプリケーションのバグ修正をAWSが行う",
+      "Multi-AZによる高可用性"
+    ],
+    "answer": 2,
+    "explanation": "RDSはマネージドだが、アプリケーションの責任は利用者側にある（責任共有モデル）。"
+  }
+  {
+    "id": "6-3",
+    "chapter": 6,
+    "thought": "⑥ サーバー管理は本質ではない",
+    "question": "次のうち、思想⑥に最も反する設計はどれか。",
+    "choices": [
+      "DynamoDBを使いサーバレス化",
+      "Lambdaでイベント駆動処理",
+      "EC2にDB・API・バッチを集約",
+      "Fargateでコンテナ運用"
+    ],
+    "answer": 2,
+    "explanation": "1台のEC2に責務を集約すると、管理負荷と障害影響が最大化する。"
+  }
 ]
