@@ -301,6 +301,76 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
 
 
 
+
+<!-- ===== Modals ===== -->
+<div id="glossMask" class="modalMask" role="dialog" aria-modal="true" aria-label="用語">
+  <div class="modal">
+    <div class="head">
+      <div style="font-weight:700">用語</div>
+      <div class="row" style="gap:8px">
+        <button id="glossToggleAddBtn" class="btn">追加フォームを隠す</button>
+        <button id="glossClose" class="btn">閉じる</button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <input id="glossSearch" class="sel" style="flex:1" placeholder="検索（用語/説明/タグ）"/>
+    </div>
+
+    <div class="glossAddPanel" style="padding:10px;border:1px solid var(--line);border-radius:14px;margin-top:10px">
+      <div class="row" style="gap:10px;align-items:flex-start">
+        <input id="glossNewTerm" class="sel" style="flex:1" placeholder="用語（右クリック選択から自動入力も可）"/>
+        <input id="glossNewTags" class="sel" style="min-width:180px" placeholder="タグ（例: IAM,EC2）"/>
+      </div>
+      <div class="row" style="gap:10px;margin-top:10px;align-items:flex-start">
+        <input id="glossNewDesc" class="sel" style="flex:1;min-width:220px" placeholder="説明"/>
+        <button id="glossAddBtn" class="btn primary">追加</button>
+        <button id="glossExportUserBtn" class="btn">ユーザー用語をJSON出力</button>
+      </div>
+
+      <div class="tagRow" style="margin-top:10px">
+        <span class="tag" id="tagIAM">IAM</span>
+        <span class="tag" id="tagEC2">EC2</span>
+        <span class="tag" id="tagST">ST</span>
+        <span class="tag" id="tagNW">NW</span>
+        <span class="tag" id="tagDB">DB</span>
+        <span class="tag" id="tagAI">AI</span>
+        <span class="tag" id="tagOTHER">OTHER</span>
+      </div>
+      <div class="small" style="margin-top:6px">※ タグをクリックすると入力欄に追記されます</div>
+    </div>
+
+    <div id="glossList" class="list"></div>
+  </div>
+</div>
+
+<div id="histMask" class="modalMask" role="dialog" aria-modal="true" aria-label="履歴">
+  <div class="modal">
+    <div class="head">
+      <div style="font-weight:700">履歴</div>
+      <div class="row" style="gap:8px">
+        <button id="histCopyAllBtn" class="btn">全コピー</button>
+        <button id="histExportBtn" class="btn">JSON出力</button>
+        <button id="histClearBtn" class="btn">履歴クリア</button>
+        <button id="histClose" class="btn">閉じる</button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px;gap:10px">
+      <select id="histFilter" class="sel">
+        <option value="all">すべて</option>
+        <option value="unanswered">未回答</option>
+        <option value="answered">回答済み</option>
+        <option value="correct">正解</option>
+        <option value="wrong">不正解</option>
+      </select>
+      <input id="histSearch" class="sel" style="flex:1" placeholder="検索（問題文）"/>
+    </div>
+
+    <div id="histList" class="list"></div>
+  </div>
+</div>
+
 <script>
 // --- iOS Safari / private mode safe storage wrapper ---
 const _storage = (()=>{
