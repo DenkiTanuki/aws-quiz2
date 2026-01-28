@@ -189,7 +189,7 @@
     "id": "6-1",
     "chapter": 6,
     "qnum": 1,
-    "thoughtTitle": "⑥ サーバー管理は本質ではない",
+    "thoughtTitle": "サーバー管理は本質ではない",
     "stem": "スタートアップが Web API を短期間で立ち上げたい。OSパッチ適用や冗長化対応に人手を割きたくない。最も適切な構成はどれか。",
     "choices": [
       {
@@ -210,7 +210,7 @@
       }
     ],
     "answer": [
-      "B"
+      "C"
     ],
     "explanation": "思想⑥では、OS管理や冗長化運用を人が抱える設計を避ける。Lambda＋API Gatewayはサーバ管理が不要。",
     "required": 1,
@@ -220,7 +220,7 @@
     "id": "6-2",
     "chapter": 6,
     "qnum": 2,
-    "thoughtTitle": "⑥ サーバー管理は本質ではない",
+    "thoughtTitle": "サーバー管理は本質ではない",
     "stem": "RDS を利用する主なメリットとして最も適切でないものはどれか。",
     "choices": [
       {
@@ -241,7 +241,7 @@
       }
     ],
     "answer": [
-      "B"
+      "C"
     ],
     "explanation": "RDSはマネージドだが、アプリケーションの責任は利用者側にある（責任共有モデル）。",
     "required": 1,
@@ -251,7 +251,7 @@
     "id": "6-3",
     "chapter": 6,
     "qnum": 3,
-    "thoughtTitle": "⑥ サーバー管理は本質ではない",
+    "thoughtTitle": "サーバー管理は本質ではない",
     "stem": "次のうち、思想⑥に最も反する設計はどれか。",
     "choices": [
       {
@@ -272,7 +272,7 @@
       }
     ],
     "answer": [
-      "B"
+      "C"
     ],
     "explanation": "1台のEC2に責務を集約すると、管理負荷と障害影響が最大化する。",
     "required": 1,
