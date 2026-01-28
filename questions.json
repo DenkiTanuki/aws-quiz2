@@ -188,43 +188,94 @@
   {
     "id": "6-1",
     "chapter": 6,
-    "thought": "⑥ サーバー管理は本質ではない",
-    "question": "スタートアップが Web API を短期間で立ち上げたい。OSパッチ適用や冗長化対応に人手を割きたくない。最も適切な構成はどれか。",
+    "qnum": 1,
+    "thoughtTitle": "⑥ サーバー管理は本質ではない",
+    "stem": "スタートアップが Web API を短期間で立ち上げたい。OSパッチ適用や冗長化対応に人手を割きたくない。最も適切な構成はどれか。",
     "choices": [
-      "EC2（Amazon Linux）＋手動パッチ",
-      "EC2＋Auto Scaling＋ALB",
-      "Lambda＋API Gateway",
-      "EC2＋Docker＋cron"
+      {
+        "key": "A",
+        "text": "EC2（Amazon Linux）＋手動パッチ"
+      },
+      {
+        "key": "B",
+        "text": "EC2＋Auto Scaling＋ALB"
+      },
+      {
+        "key": "C",
+        "text": "Lambda＋API Gateway"
+      },
+      {
+        "key": "D",
+        "text": "EC2＋Docker＋cron"
+      }
     ],
-    "answer": 2,
+    "answer": [
+      "B"
+    ],
     "explanation": "思想⑥では、OS管理や冗長化運用を人が抱える設計を避ける。Lambda＋API Gatewayはサーバ管理が不要。"
+    "required": 1,
+    "multi": false
   },
   {
     "id": "6-2",
     "chapter": 6,
-    "thought": "⑥ サーバー管理は本質ではない",
-    "question": "RDS を利用する主なメリットとして最も適切でないものはどれか。",
+    "qnum": 2,
+    "thoughtTitle": "⑥ サーバー管理は本質ではない",
+    "stem": "RDS を利用する主なメリットとして最も適切でないものはどれか。",
     "choices": [
-      "OS管理が不要",
-      "バックアップの自動化",
-      "アプリケーションのバグ修正をAWSが行う",
-      "Multi-AZによる高可用性"
+      {
+        "key": "A",
+        "text": "OS管理が不要"
+      },
+      {
+        "key": "B",
+        "text": "バックアップの自動化"
+      },
+      {
+        "key": "C",
+        "text": "アプリケーションのバグ修正をAWSが行う"
+      },
+      {
+        "key": "D",
+        "text": "Multi-AZによる高可用性"
+      }
     ],
-    "answer": 2,
+    "answer": [
+      "B"
+    ],
     "explanation": "RDSはマネージドだが、アプリケーションの責任は利用者側にある（責任共有モデル）。"
+    "required": 1,
+    "multi": false
   },
   {
     "id": "6-3",
     "chapter": 6,
-    "thought": "⑥ サーバー管理は本質ではない",
-    "question": "次のうち、思想⑥に最も反する設計はどれか。",
+    "qnum": 3,
+    "thoughtTitle": "⑥ サーバー管理は本質ではない",
+    "stem": "次のうち、思想⑥に最も反する設計はどれか。",
     "choices": [
-      "DynamoDBを使いサーバレス化",
-      "Lambdaでイベント駆動処理",
-      "EC2にDB・API・バッチを集約",
-      "Fargateでコンテナ運用"
+      {
+        "key": "A",
+        "text": "DynamoDBを使いサーバレス化"
+      },
+      {
+        "key": "B",
+        "text": "Lambdaでイベント駆動処理"
+      },
+      {
+        "key": "C",
+        "text": "EC2にDB・API・バッチを集約"
+      },
+      {
+        "key": "D",
+        "text": "Fargateでコンテナ運用"
+      }
     ],
-    "answer": 2,
+    "answer": [
+      "B"
+    ],
     "explanation": "1台のEC2に責務を集約すると、管理負荷と障害影響が最大化する。"
+    "required": 1,
+    "multi": false
   }
 ]
