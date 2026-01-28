@@ -209,7 +209,16 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
   /* 2nd row: glossary / history / status */
   #glossBtn{ order:4; }
   #histBtn{ order:5; }
-  #statusBadge{ order:6; flex:1 1 auto; <header>
+  #statusBadge{ order:6; flex:1 1 auto; lex:1 1 45%; } /* 2列っぽく均等 */
+
+  .card{ padding:14px; }
+  .modal{ max-height: calc(85vh - var(--safe-b)); }
+}
+
+</style>
+</head>
+<body>
+<header>
   <div class="topbar">
     <button id="filterToggleBtn" class="btn" title="フィルタ・表示設定を開閉">フィルタ・表示設定</button>
     <span id="filterSummary" class="badge mini">-</span>
@@ -247,32 +256,6 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
     <div class="filterSubLabel">思想（横断フィルタ）</div>
     <div id="thoughtBar" class="thoughtbar"></div>
   </div>
-</header>lex:1 1 45%; } /* 2列っぽく均等 */
-
-  .card{ padding:14px; }
-  .modal{ max-height: calc(85vh - var(--safe-b)); }
-}
-
-</style>
-</head>
-<body>
-<header>
-  <div class="topbar">
-    <select id="chapterSel" class="sel"></select>
-    <select id="modeSel" class="sel">
-      <option value="normal">通常</option>
-      <option value="random">ランダム</option>
-    </select>
-    <select id="themeSel" class="sel" title="背景テーマ">
-      <option value="dark">黒</option>
-      <option value="light">白</option>
-      <option value="beige">ベージュ</option>
-    </select>
-    <button id="glossBtn" class="btn">用語</button>
-    <button id="histBtn" class="btn">履歴</button>
-    <span id="statusBadge" class="badge">正解 0（回答済 0） / 0問</span>
-  </div>
-  <div id="thoughtBar" class="thoughtbar"></div>
 </header>
 
 <main>
