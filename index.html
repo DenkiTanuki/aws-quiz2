@@ -255,6 +255,15 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
 
     <div class="filterSubLabel">思想（横断フィルタ）</div>
     <div id="thoughtBar" class="thoughtbar"></div>
+
+    <div class="filterSubLabel">出題フィルタ</div>
+    <div class="row" style="gap:10px;flex-wrap:wrap">
+      <button id="topBtn" class="btn">先頭へ</button>
+      <button id="wrongFilterBtn" class="btn">×だけ（フィルタ）</button>
+      <button id="unansweredFilterBtn" class="btn">未回答だけ（フィルタ）</button>
+      <button id="clearFilterBtn" class="btn">フィルタ解除</button>
+    </div>
+    <div class="small" style="margin-top:8px">※ 状態はブラウザに保存（localStorage）</div>
   </div>
 </header>
 
@@ -290,78 +299,7 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
   </div>
 </main>
 
-<div class="footerbar">
-  <div class="inner">
-    <div class="row">
-      <button id="topBtn" class="btn">先頭へ</button>
-      <button id="wrongFilterBtn" class="btn">×だけ（フィルタ）</button>
-      <button id="unansweredFilterBtn" class="btn">未回答だけ（フィルタ）</button>
-      <button id="clearFilterBtn" class="btn">フィルタ解除</button>
-    </div>
-    <div class="small">※ 状態はブラウザに保存（localStorage）</div>
-  </div>
-</div>
 
-<!-- Glossary Modal -->
-<div id="glossMask" class="modalMask">
-  <div class="modal">
-    <div class="head">
-      <div class="row">
-        <span class="badge">用語（牽引）</span>
-        <input id="glossSearch" class="sel" style="width:min(420px,100%)" placeholder="検索（例：EC2）"/>
-      </div>
-      <div class="row"><button class="btn" id="glossToggleAddBtn">追加フォームを隠す</button><button class="btn" id="glossExportUserBtn">ユーザー用語Export</button><button class="btn" id="glossClose">閉じる</button></div>
-    </div>
-    <div class="panel glossAddPanel">
-      <div class="row" style="gap:8px">
-        <input id="glossNewTerm" class="sel" style="width:min(260px,100%)" placeholder="右クリック選択→ここに入ります（用語）"/>
-        <input id="glossNewDesc" class="sel" style="flex:1;min-width:240px" placeholder="説明（短くでOK）"/>
-      </div>
-      <div class="row" style="gap:8px;margin-top:8px">
-        <span class="small">タグ：</span>
-        <input id="glossNewTags" class="sel" style="flex:1;min-width:220px" placeholder="例：IAM, EC2, NW（カンマ区切り）"/>
-        <button class="btn" id="tagIAM">IAM</button>
-        <button class="btn" id="tagEC2">EC2</button>
-        <button class="btn" id="tagST">ST</button>
-        <button class="btn" id="tagNW">NW</button>
-        <button class="btn" id="tagDB">DB</button>
-        <button class="btn" id="tagAI">AI</button>
-        <button class="btn" id="tagOTHER">OTHER</button>
-        <button id="glossAddBtn" class="btn primary">追加</button>
-      </div>
-      <div class="small" style="margin-top:8px">※ 右クリックで問題文の選択語を自動入力できます（選択→右クリック）</div>
-    </div>
-
-    <div id="glossList" class="list"></div>
-  </div>
-</div>
-
-<!-- History Modal -->
-<div id="histMask" class="modalMask">
-  <div class="modal">
-    <div class="head">
-      <div class="row">
-        <span class="badge">履歴一覧</span>
-        <select id="histFilter" class="sel">
-          <option value="all">すべて</option>
-          <option value="unanswered">未回答</option>
-          <option value="wrong">×のみ</option>
-          <option value="correct">○のみ</option>
-          <option value="answered">回答済</option>
-        </select>
-        <input id="histSearch" class="sel" style="width:min(420px,100%)" placeholder="検索（問題文の一部）"/>
-      </div>
-      <button class="btn" id="histClearBtn">履歴クリア</button>
-      <button class="btn" id="histCopyAllBtn">全コピー</button>
-      <button class="btn" id="histExportBtn">エクスポート</button>
-      <button class="btn" id="histClose">閉じる</button>
-    </div>
-    <div id="histList" class="list"></div>
-  </div>
-</div>
-
-
-<!-- 外部JSON専用版: questions.json / glossary.json を同フォルダに置いてください -->
 
 <script>
 // --- iOS Safari / private mode safe storage wrapper ---
@@ -521,6 +459,15 @@ function initFilterPanel(){
       const nowOpen = !filterPanel.classList.contains("hidden");
       setFilterPanelOpen(!nowOpen);
     });
+
+    // パネル外クリックで閉じる（ボタン・パネル内は無視）
+    document.addEventListener("click",(e)=>{
+      if (!filterPanel || filterPanel.classList.contains("hidden")) return;
+      const t = e.target;
+      if (filterToggleBtn && filterToggleBtn.contains(t)) return;
+      if (filterPanel.contains(t)) return;
+      setFilterPanelOpen(false);
+    });
   }
 }
 
@@ -598,6 +545,8 @@ function buildThoughtBar(){
   allBtn.addEventListener("click", ()=>{
     activeThoughts = new Set();
     buildThoughtBar();
+  initFilterPanel();
+  updateFilterSummary();
     qIndex = 0;
     applyMode();
   });
@@ -1215,6 +1164,11 @@ document.addEventListener("keydown",(e)=>{
   else if (e.key.toLowerCase()==="e") { toggleExplain(); }
   else if (e.key.toLowerCase()==="g") { openGloss(); }
   else if (e.key.toLowerCase()==="h") { openHist(); }
+  else if (e.key==="Escape") {
+    if (filterPanel && !filterPanel.classList.contains("hidden")) {
+      setFilterPanelOpen(false);
+    }
+  }
 });
 
 
@@ -1244,8 +1198,6 @@ async function init() {
     themeSel.value = lsGet(LS_THEME) || "dark";
     themeSel.addEventListener("change", ()=> applyTheme(themeSel.value));
   }
-  initFilterPanel();
-  updateFilterSummary();
   applyMode();
 }
 init();
