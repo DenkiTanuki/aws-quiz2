@@ -277,5 +277,191 @@
     "explanation": "1台のEC2に責務を集約すると、管理負荷と障害影響が最大化する。",
     "required": 1,
     "multi": false
+  },
+  {
+    "id": "7-1",
+    "chapter": 7,
+    "qnum": 1,
+    "thoughtTitle": "⑦ データは消える前提で守れ（バックアップは『戻せる』が本体）",
+    "stem": "RDS を利用している。自動バックアップを有効化しているため、データ保護は十分だと考えている。この考え方の弱点として最も適切なものはどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "バックアップ保存期間が1日以上にできない"
+      },
+      {
+        "key": "B",
+        "text": "復元テスト（リストア）が行われていない可能性がある"
+      },
+      {
+        "key": "C",
+        "text": "Multi-AZ を設定すると自動バックアップが無効になる"
+      },
+      {
+        "key": "D",
+        "text": "暗号化を有効化するとバックアップが取得できない"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "思想⑦のポイントは『バックアップは取るだけでは不十分。実際に復元できることを確認して初めて価値になる』。",
+    "required": false,
+    "multi": false
+  },
+  {
+    "id": "7-2",
+    "chapter": 7,
+    "qnum": 2,
+    "thoughtTitle": "⑦ データは消える前提で守れ（バックアップは『戻せる』が本体）",
+    "stem": "S3 に重要データを保存している。リージョン障害レベルの災害も想定して耐性を高めたい。最も適切な構成はどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "S3 標準ストレージに保存する"
+      },
+      {
+        "key": "B",
+        "text": "S3 バージョニングのみを有効化する"
+      },
+      {
+        "key": "C",
+        "text": "Cross-Region Replication（CRR）を設定する"
+      },
+      {
+        "key": "D",
+        "text": "S3 へのアップロードをマルチパートにする"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "思想⑦では『消える前提』で守る。リージョン障害を想定するなら別リージョンへ複製する CRR が有効。",
+    "required": false,
+    "multi": false
+  },
+  {
+    "id": "7-3",
+    "chapter": 7,
+    "qnum": 3,
+    "thoughtTitle": "⑦ データは消える前提で守れ（バックアップは『戻せる』が本体）",
+    "stem": "EBS スナップショットを取得しているが、保管先リージョンは同一のままで運用している。最も懸念すべき点はどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "スナップショットは1つしか作成できない"
+      },
+      {
+        "key": "B",
+        "text": "スナップショットは増分であり復元できない"
+      },
+      {
+        "key": "C",
+        "text": "同一リージョン障害時にスナップショットへアクセスできない可能性がある"
+      },
+      {
+        "key": "D",
+        "text": "スナップショットは暗号化できない"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "思想⑦は『データは消える前提』。同一リージョンに依存すると、リージョン障害でバックアップごと使えないリスクが残る。",
+    "required": false,
+    "multi": false
+  },
+  {
+    "id": "8-1",
+    "chapter": 8,
+    "qnum": 1,
+    "thoughtTitle": "⑧ ネットワークは信用するな（内部=安全は幻想）",
+    "stem": "VPC 内の EC2 間通信について、最も適切な説明はどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "VPC 内は信頼できるため、アプリケーション側の認証・認可は不要である"
+      },
+      {
+        "key": "B",
+        "text": "Security Group があるため、通信は自動的に暗号化される"
+      },
+      {
+        "key": "C",
+        "text": "内部通信であっても最小権限の通信制御（Security Group 等）が重要である"
+      },
+      {
+        "key": "D",
+        "text": "NACL が設定されていれば Security Group は不要である"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "思想⑧は『内部=安全は幻想』。侵入済み前提で、内部通信でも最小権限の制御を行う。",
+    "required": false,
+    "multi": false
+  },
+  {
+    "id": "8-2",
+    "chapter": 8,
+    "qnum": 2,
+    "thoughtTitle": "⑧ ネットワークは信用するな（内部=安全は幻想）",
+    "stem": "Security Group と Network ACL（NACL）の違いとして正しいものはどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "Security Group はステートレスで、NACL はステートフルである"
+      },
+      {
+        "key": "B",
+        "text": "Security Group はインスタンス（ENI）に適用され、NACL はサブネットに適用される"
+      },
+      {
+        "key": "C",
+        "text": "NACL は許可ルールしか作れず、拒否ルールは作れない"
+      },
+      {
+        "key": "D",
+        "text": "Security Group はサブネット単位に適用される"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Security Group はインスタンス（ENI）に付与するステートフルなフィルタ。NACL はサブネット境界で評価されるステートレスなフィルタ。",
+    "required": false,
+    "multi": false
+  },
+  {
+    "id": "8-3",
+    "chapter": 8,
+    "qnum": 3,
+    "thoughtTitle": "⑧ ネットワークは信用するな（内部=安全は幻想）",
+    "stem": "Zero Trust（常に検証する）に近い設計として最も適切なものはどれか。",
+    "choices": [
+      {
+        "key": "A",
+        "text": "VPN 接続できた端末は、社内システムへ自由にアクセスできる"
+      },
+      {
+        "key": "B",
+        "text": "VPC 内の通信はすべて許可し、境界でのみ防御する"
+      },
+      {
+        "key": "C",
+        "text": "IAM の認可 + Security Group の最小許可 + アプリケーション認証を組み合わせる"
+      },
+      {
+        "key": "D",
+        "text": "NACL のみで全通信を制御する"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "思想⑧では『境界を信じない』。認証（誰か）と認可（何ができるか）を複数レイヤーで検証する設計が Zero Trust に近い。",
+    "required": false,
+    "multi": false
   }
 ]
