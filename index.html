@@ -62,6 +62,23 @@ select,button,input{font:inherit}
 .thoughtBtn.all{color:var(--muted)}
 .thoughtHint{font-size:12px;color:var(--muted);margin-left:2px}
 
+
+/* Collapsible filter panel */
+.badge.mini{padding:7px 10px;font-size:12px;max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filterPanel{max-width:1200px;margin:0 auto;padding:0 12px 12px;border-top:1px solid var(--barborder)}
+.filterGrid{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;padding-top:10px}
+.filterItem{display:flex;gap:8px;align-items:center}
+.filterLabel{font-size:12px;color:var(--muted);min-width:38px}
+.filterSubLabel{margin-top:10px;font-size:12px;color:var(--muted)}
+/* make the thoughtbar live nicely inside panel */
+#filterPanel .thoughtbar{padding:8px 0 0;margin:0;max-width:none}
+
+@media (max-width: 520px){
+  .badge.mini{max-width:100%}
+  #filterSummary{flex:1 1 100%}
+  #filterToggleBtn{flex:0 0 auto}
+}
+
 /* Light/Beige themes: make key navigation buttons slightly darker for readability */
 body[data-theme="light"] #toggleExplainBtn,
 body[data-theme="light"] #prevBtn,
@@ -192,23 +209,45 @@ main{ padding-bottom: calc(90px + var(--safe-b)); }
   /* 2nd row: glossary / history / status */
   #glossBtn{ order:4; }
   #histBtn{ order:5; }
-  #statusBadge{ order:6; flex:1 1 auto; min-width:0; white-space:nowrap; }
+  #statusBadge{ order:6; flex:1 1 auto; <header>
+  <div class="topbar">
+    <button id="filterToggleBtn" class="btn" title="フィルタ・表示設定を開閉">フィルタ・表示設定</button>
+    <span id="filterSummary" class="badge mini">-</span>
+    <button id="glossBtn" class="btn">用語</button>
+    <button id="histBtn" class="btn">履歴</button>
+    <span id="statusBadge" class="badge">正解 0（回答済 0） / 0問</span>
+  </div>
 
-  /* Make selects a bit tighter on iPhone */
-  .topbar .sel{ padding:8px 9px; }
+  <!-- 折りたたみ：フィルタ／表示設定 -->
+  <div id="filterPanel" class="filterPanel hidden">
+    <div class="filterGrid">
+      <div class="filterItem">
+        <div class="filterLabel">章</div>
+        <select id="chapterSel" class="sel"></select>
+      </div>
 
-  /* --- v1.0.1: bottom filter bar wrap (no overflow) --- */
-  .footerbar .row{ flex-wrap:wrap; overflow:visible; -webkit-overflow-scrolling:touch; }
-  .footerbar .row::-webkit-scrollbar{ display:none; }
-  .footerbar .row .btn{ flex:1 1 45%; }
+      <div class="filterItem">
+        <div class="filterLabel">出題順</div>
+        <select id="modeSel" class="sel">
+          <option value="normal">通常</option>
+          <option value="random">ランダム</option>
+        </select>
+      </div>
 
-  /* --- v1.0.1: modal width on iPhone (prevent right cut) --- */
-  .modalMask{ padding:8px; }
-  .modal{ width: calc(100vw - 16px); max-width: calc(100vw - 16px); }
-  .modal .head{ flex-wrap:wrap; gap:8px; }
+      <div class="filterItem">
+        <div class="filterLabel">テーマ</div>
+        <select id="themeSel" class="sel" title="背景テーマ">
+          <option value="dark">黒</option>
+          <option value="light">白</option>
+          <option value="beige">ベージュ</option>
+        </select>
+      </div>
+    </div>
 
-   main .card .row{ flex-wrap:wrap; }
-   main .card .row .btn{ flex:1 1 45%; } /* 2列っぽく均等 */
+    <div class="filterSubLabel">思想（横断フィルタ）</div>
+    <div id="thoughtBar" class="thoughtbar"></div>
+  </div>
+</header>lex:1 1 45%; } /* 2列っぽく均等 */
 
   .card{ padding:14px; }
   .modal{ max-height: calc(85vh - var(--safe-b)); }
@@ -405,6 +444,11 @@ let modeSel = document.getElementById("modeSel");
 let themeSel = document.getElementById("themeSel");
 let statusBadge = document.getElementById("statusBadge");
 
+let filterToggleBtn = document.getElementById("filterToggleBtn");
+let filterPanel = document.getElementById("filterPanel");
+let filterSummary = document.getElementById("filterSummary");
+const LS_FILTER_OPEN = "aws_quiz_filter_open_v1";
+
 let qIndex = 0;
 let activeList = [];
 let wrongOnly = false;
@@ -429,6 +473,73 @@ function applyTheme(theme){
   if (themeSel) themeSel.value = t;
 }
 
+
+
+function buildFilterSummaryText(){
+  const parts = [];
+
+  // 思想
+  if (activeThoughts && activeThoughts.size){
+    const arr = Array.from(activeThoughts);
+    const short = arr.map(t => (t.length>18 ? t.slice(0,18)+"…" : t));
+    parts.push("思想:" + short.join("+"));
+  } else {
+    parts.push("思想:ALL");
+  }
+
+  // 章
+  try{
+    const ch = parseInt(chapterSel.value,10);
+    if (!ch) parts.push("章:全章");
+    else parts.push(ch===999 ? "章:独自問題" : `章:第${ch}章`);
+  }catch(e){}
+
+  // 出題順
+  try{
+    const mode = modeSel.value === "random" ? "ランダム" : "通常";
+    parts.push("順:" + mode);
+  }catch(e){}
+
+  // テーマ
+  try{
+    const theme = themeSel.value;
+    const th = theme==="beige" ? "ベージュ" : (theme==="light" ? "白" : "黒");
+    parts.push("色:" + th);
+  }catch(e){}
+
+  // 下部フィルタ
+  if (wrongOnly) parts.push("×だけ");
+  if (unansweredOnly) parts.push("未回答だけ");
+
+  return parts.join("｜");
+}
+
+function updateFilterSummary(){
+  if (!filterSummary) return;
+  filterSummary.textContent = buildFilterSummaryText();
+  filterSummary.title = filterSummary.textContent;
+}
+
+function setFilterPanelOpen(isOpen){
+  if (!filterPanel) return;
+  filterPanel.classList.toggle("hidden", !isOpen);
+  try { lsSet(LS_FILTER_OPEN, isOpen ? "1" : "0"); } catch(e) {}
+}
+
+function initFilterPanel(){
+  if (!filterToggleBtn || !filterPanel) return;
+  // 初期状態：保存値があればそれを使用
+  const open = (lsGet(LS_FILTER_OPEN) ?? "0") === "1";
+  setFilterPanelOpen(open);
+
+  if (!filterToggleBtn.dataset.bound){
+    filterToggleBtn.dataset.bound = "1";
+    filterToggleBtn.addEventListener("click", ()=>{
+      const nowOpen = !filterPanel.classList.contains("hidden");
+      setFilterPanelOpen(!nowOpen);
+    });
+  }
+}
 
 function stripLeak(s) {
   if (!s) return "";
@@ -504,6 +615,8 @@ function buildThoughtBar(){
   allBtn.addEventListener("click", ()=>{
     activeThoughts = new Set();
     buildThoughtBar();
+  initFilterPanel();
+  updateFilterSummary();
     qIndex = 0;
     applyMode();
   });
@@ -603,6 +716,7 @@ function applyMode() {
   activeList = list;
   if (qIndex >= activeList.length) qIndex = Math.max(0, activeList.length - 1);
   updateStatus();
+  updateFilterSummary();
   render();
 }
 
@@ -618,6 +732,7 @@ function updateStatus() {
   }
   const rate = answered > 0 ? Math.round((correct / answered) * 100) : 0;
   statusBadge.textContent = `正解 ${correct}（回答済 ${answered} / 正解率 ${rate}%） / ${total}問`;
+  updateFilterSummary();
 }
 
 function setPanelsHidden() {
