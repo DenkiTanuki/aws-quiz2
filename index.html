@@ -615,8 +615,6 @@ function buildThoughtBar(){
   allBtn.addEventListener("click", ()=>{
     activeThoughts = new Set();
     buildThoughtBar();
-  initFilterPanel();
-  updateFilterSummary();
     qIndex = 0;
     applyMode();
   });
@@ -1268,6 +1266,9 @@ async function init() {
     themeSel.value = lsGet(LS_THEME) || "dark";
     themeSel.addEventListener("change", ()=> applyTheme(themeSel.value));
   }
+
+  // 折りたたみフィルタ：初期化＋サマリ更新
+
   applyMode();
 }
 init();
