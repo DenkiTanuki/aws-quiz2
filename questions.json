@@ -587,5 +587,209 @@
     "explanation": "思想⑧では『境界を信じない』。認証（誰か）と認可（何ができるか）を複数レイヤーで検証する設計が Zero Trust に近い。",
     "required": 1,
     "multi": false
+  },
+  {
+    "id": "9-1",
+    "chapter": 9,
+    "qnum": 1,
+    "thoughtTitle": "⑨ 遅延はユーザー体験を殺す",
+    "stem": "海外ユーザーからWebアクセスが遅いという苦情が増えている。AWSの思想⑨に最も沿った改善策はどれか。",
+    "choices": [
+      {"key":"A","text":"EC2のインスタンスタイプを大型化する"},
+      {"key":"B","text":"CloudFrontを利用してエッジ配信する"},
+      {"key":"C","text":"運用担当者を24時間常駐させる"},
+      {"key":"D","text":"回線速度が改善されるのを待つ"}
+    ],
+    "answer":["B"],
+    "explanation":"思想⑨は『距離＝遅延』という物理法則を前提にする。ユーザーに近い場所から配信する設計が本質。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "9-2",
+    "chapter": 9,
+    "qnum": 2,
+    "thoughtTitle": "⑨ 遅延はユーザー体験を殺す",
+    "stem": "レイテンシ対策として不適切な考え方はどれか。",
+    "choices": [
+      {"key":"A","text":"ユーザーに近いリージョンを選択する"},
+      {"key":"B","text":"CloudFrontでキャッシュを活用する"},
+      {"key":"C","text":"遅延はネットワークだけの問題と考える"},
+      {"key":"D","text":"アプリ設計でも遅延を意識する"}
+    ],
+    "answer":["C"],
+    "explanation":"遅延はインフラだけでなくアプリ設計にも影響する。思想⑨はレイヤー横断で考える。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "9-3",
+    "chapter": 9,
+    "qnum": 3,
+    "thoughtTitle": "⑨ 遅延はユーザー体験を殺す",
+    "stem": "グローバルAPIの初回接続レイテンシを下げる構成として最も適切なのはどれか。",
+    "choices": [
+      {"key":"A","text":"単一リージョンに高性能EC2を配置する"},
+      {"key":"B","text":"Global Acceleratorを利用する"},
+      {"key":"C","text":"RDSをMulti-AZ構成にする"},
+      {"key":"D","text":"Auto Scalingで台数を増やす"}
+    ],
+    "answer":["B"],
+    "explanation":"Global Acceleratorは最寄りエッジへ誘導し、AWSバックボーンを利用して遅延を削減する。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "10-1",
+    "chapter": 10,
+    "qnum": 1,
+    "thoughtTitle": "⑩ 料金は技術問題である",
+    "stem": "AWS利用料が想定以上に増加している。思想⑩として最も不適切な考え方はどれか。",
+    "choices": [
+      {"key":"A","text":"Cost Explorerで傾向を把握する"},
+      {"key":"B","text":"Budgetsで通知を設定する"},
+      {"key":"C","text":"料金は経理部門の問題と考える"},
+      {"key":"D","text":"Savings Plansを検討する"}
+    ],
+    "answer":["C"],
+    "explanation":"料金は設計の結果であり、思想⑩では技術者が責任を持つ。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "10-2",
+    "chapter": 10,
+    "qnum": 2,
+    "thoughtTitle": "⑩ 料金は技術問題である",
+    "stem": "コスト最適化の説明として誤っているものはどれか。",
+    "choices": [
+      {"key":"A","text":"不要なリソースを削除する"},
+      {"key":"B","text":"常に最安サービスを選択する"},
+      {"key":"C","text":"スケールインも考慮する"},
+      {"key":"D","text":"利用状況を可視化する"}
+    ],
+    "answer":["B"],
+    "explanation":"最安＝最適ではない。価値とコストのバランスを設計する。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "10-3",
+    "chapter": 10,
+    "qnum": 3,
+    "thoughtTitle": "⑩ 料金は技術問題である",
+    "stem": "長期間稼働が見込まれるEC2のコストを抑える方法として最も適切なのはどれか。",
+    "choices": [
+      {"key":"A","text":"オンデマンドを使い続ける"},
+      {"key":"B","text":"Savings Plansを利用する"},
+      {"key":"C","text":"夜間は手動停止する"},
+      {"key":"D","text":"インスタンスタイプを固定する"}
+    ],
+    "answer":["B"],
+    "explanation":"予測可能な利用には割引モデルを適用するのが思想⑩。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "11-1",
+    "chapter": 11,
+    "qnum": 1,
+    "thoughtTitle": "⑪ 移行は一発では終わらない",
+    "stem": "オンプレミスからAWSへの移行方針として最も適切なのはどれか。",
+    "choices": [
+      {"key":"A","text":"全システムを一夜で移行する"},
+      {"key":"B","text":"段階的に移行し検証を繰り返す"},
+      {"key":"C","text":"移行後の運用は考慮しない"},
+      {"key":"D","text":"移行は一度きりと考える"}
+    ],
+    "answer":["B"],
+    "explanation":"思想⑪では移行は継続的プロセスと捉える。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "11-2",
+    "chapter": 11,
+    "qnum": 2,
+    "thoughtTitle": "⑪ 移行は一発では終わらない",
+    "stem": "移行計画において最もリスクが高い考え方はどれか。",
+    "choices": [
+      {"key":"A","text":"並行稼働期間を設ける"},
+      {"key":"B","text":"ロールバック手順を用意する"},
+      {"key":"C","text":"Big Bang方式で切り替える"},
+      {"key":"D","text":"段階的にデータ移行する"}
+    ],
+    "answer":["C"],
+    "explanation":"一発切替は失敗時の影響が最大化する。思想⑪が否定する方式。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "11-3",
+    "chapter": 11,
+    "qnum": 3,
+    "thoughtTitle": "⑪ 移行は一発では終わらない",
+    "stem": "大量データを物理的にAWSへ移行する際に適したサービスはどれか。",
+    "choices": [
+      {"key":"A","text":"DMS"},
+      {"key":"B","text":"Snowball"},
+      {"key":"C","text":"CloudFront"},
+      {"key":"D","text":"SQS"}
+    ],
+    "answer":["B"],
+    "explanation":"ネット転送が現実的でない場合、物理移行が有効。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "12-1",
+    "chapter": 12,
+    "qnum": 1,
+    "thoughtTitle": "⑫ 可観測性がないシステムは死んでいる",
+    "stem": "障害時に原因特定ができない最大の要因はどれか。",
+    "choices": [
+      {"key":"A","text":"ログが取得されていない"},
+      {"key":"B","text":"Auto Scalingが有効"},
+      {"key":"C","text":"Multi-AZ構成"},
+      {"key":"D","text":"IAMロールを利用している"}
+    ],
+    "answer":["A"],
+    "explanation":"思想⑫は『見えない＝直せない』。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "12-2",
+    "chapter": 12,
+    "qnum": 2,
+    "thoughtTitle": "⑫ 可観測性がないシステムは死んでいる",
+    "stem": "可観測性の説明として誤っているものはどれか。",
+    "choices": [
+      {"key":"A","text":"メトリクスを収集する"},
+      {"key":"B","text":"ログを保存する"},
+      {"key":"C","text":"人の経験で障害対応する"},
+      {"key":"D","text":"トレースで処理経路を追う"}
+    ],
+    "answer":["C"],
+    "explanation":"人の勘に依存する運用は再現性がなく、思想⑫に反する。",
+    "required":1,
+    "multi":false
+  },
+  {
+    "id": "12-3",
+    "chapter": 12,
+    "qnum": 3,
+    "thoughtTitle": "⑫ 可観測性がないシステムは死んでいる",
+    "stem": "分散システムで処理遅延の原因追跡に最も有効なAWSサービスはどれか。",
+    "choices": [
+      {"key":"A","text":"CloudWatch Logs"},
+      {"key":"B","text":"X-Ray"},
+      {"key":"C","text":"S3"},
+      {"key":"D","text":"IAM"}
+    ],
+    "answer":["B"],
+    "explanation":"X-Rayはリクエスト単位で処理経路を可視化できる。",
+    "required":1,
+    "multi":false
   }
 ]
